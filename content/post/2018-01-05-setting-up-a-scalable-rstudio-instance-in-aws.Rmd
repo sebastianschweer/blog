@@ -44,6 +44,8 @@ Ready? Alright, sweet. Then we continue with
 
 Step 2: Find the current RStudio AMI.
 
-AMI stands for Amazon Machine Images, which is like an operating system container. More to the point, in an AMI a Linux distribution can be bundled with addtional software packages tailored to any type of need: web development, accounting (I'm guessing here, but ... sure) and, most importantly, using RStudio. <HERE> you can find a wonderful storage of RStudio AMIs. We use 
+AMI stands for Amazon Machine Images, which is like an operating system container. More to the point, in an AMI a Linux distribution can be bundled with addtional software packages tailored to any type of need: web development, accounting (I'm guessing here, but ... sure) and, most importantly, using RStudio. <HERE> you can find a wonderful storage of RStudio AMIs. We use the newest version for the correct geographical zone, in my case Frankfurt:
+
+[![Screenshot_Louis_Anslett](/img/screenshot_louisaslett.png)](http://www.louisaslett.com/RStudio_AMI/)
 
  
