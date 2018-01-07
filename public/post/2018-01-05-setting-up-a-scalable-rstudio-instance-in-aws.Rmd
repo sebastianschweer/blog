@@ -1,0 +1,45 @@
+---
+title: Setting up a Scalable RStudio Instance in AWS
+author: Sebastian Schweer
+date: '2018-01-05'
+categories:
+  - AWS
+  - R
+tags:
+  - Getting Started
+  - RStudio AMI
+slug: setting-up-a-scalable-rstudio-instance-in-aws
+---
+
+# Setting up an R Environment: Available Anytime, Anywhere?
+
+ Assume you want to start to write `R` code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn't it be awesome if one could set up an environment that can be used for `R` coding independent of any device? Where all you need is a decent browser, a working internet connection and you're good to go?
+ 
+Indeed it would be! (I love rhethorical questions...) In this post, I will show you the steps for setting up such an environment on Amazon Web Services (AWS). The main advantages of using such a set-up:
+\itemize
+\item Runs on any infrastructure: All you need is a working internet connection, a decent browser and an AWS account, which is usually free.*Footnote: For a given value of usually. I personally try to test out lots of resources just because I can, yet even so, my total expenses for AWS result in 0.37€ (January 2018). A related point
+\item Runs everywhere: The AWS machine will be set up to automatically clone your GitHub repository (don't worry if this doesn't mean anything to you, this point is optional), so that you don't even have to have your codes on the device.
+\item Scalable: The AWS machine running your code can be chosen to suit any of your needs, in any session. Just playing around with a new package? Use the smallest size, doesn't cost a dime. Trying to re-create Google's preformance on a fancy DNN-classification? Go all in with 500 GB of RAM; it'll cost ya, but it's fun.
+\item Up-to-Date: Since the envirionment is freshly installed each time, your `R` version as well as the package versions in use are automatically up-to-date. In the latter case, that would also be easy to maintain on a local machine, the former, however, is a nice benefit. 
+
+Convinced? Awesome, let's get started!
+
+## Overview of main steps
+
+First a short overview of the main steps covered in this blog post:
+
+1. Get an AWS account (duh!),
+2. Find the right RStudio AMI,
+3. Define security groups for your AWS instance,
+4. Create a launch template in AWS,
+5. Run a super-sophisticated algorithm on our spankingly new machine.
+
+Preconditions for this tutorial should be basically none, at least in terms of coding and/or understanding `R` itself. The main task will lie in clicking the right buttons.
+
+Step 1: Get an AWS account.
+
+Well, it isn't really my place to tell you how to use AWS if Amazon itself did such a great job explaining it <HERE>. Just use the link to set up your account, and I further suggest to follow the following set of instructions <HERE>, building your very first instance. Take your time going through these instructions, I'll wait...
+
+Ready? Alright, sweet. Then we continue with 
+
+ 
