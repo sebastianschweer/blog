@@ -57,4 +57,35 @@ In AWS, security groups control the access to the machine over the internet (if 
 
 In our case, we actually only need access via http protocol, since the RStudio instance will allow log-in via browser interface. Therefore, our security group can be kept quite simple:
 
-The IP range 
+The IP range can be limited to a certain range of addresses to increase the safety of your instance. This precaution is necessary since only the login page of RStudio stands between the internet and your instance (spooky, huh?). The range used by your provider can be found by googling, in my case I use the list provided <HERE>.
+
+### Step 4: Create a launch template in AWS
+
+We now configure a launch template in AWS to simplify the process of starting up our RStudio instance in the future. This step is not entirely necessary, but I highly recommend it due to its simplicity and benefits. Begin by starting the launch template wizard on the AWS Dashboard Side Panel. The only things necessary for the set-up are the AMI of step 2 and the security groups from step 3 (see how neatly this all ties together? Almost as if somebody thought it through...). The only thing left to do is to choose the type of instance to start by default. I recommend to set the lowest ranking instance by default: It is still capable of running basic analyses, yet it doesn‘t cost a thing. Before clicking the finish button:
+
+FINISH BUTTON,
+
+there are two small (optional) additions that can be handled with the so-called XXXX:
+
+### Step 4a: Resetting the RStudio password
+
+In the documentation of the RStudio AMI we can find the following part: „xxx“. Alright, fine, but it bothers me to have to do that EVERY SINGLE TIME I log on. There‘s a nicer way to do this, and XXXX provides just the framework: All commands placed here get executed at the beginning of the start-up. Thus, we only need to run the code to change the password for the user RStudio, i.e.
+CODE
+Sudo kkkkk
+CODE,
+Right? Unfortunately, AWS XXX understands only BBBB encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. In Linux, this is as simple as 
+CODE
+Encode
+CODE,
+In Windows this can be done by doing ....
+
+We are almost done with the set-up now, there only remains 
+
+### Step 4b: Automatically Clone a GitHub repo
+
+I write all my private code projects on my GitHub account (here: YYY. What a shameless plug) and I also would like my code to be available for me each time I start up my RStudio instance. Fortunately, this is easily configured with XXX, by just adding the commands 
+
+CODE
+Git 
+CODE
+and running the encoding steps as in Step 4a. Now, each time I start up a new RStudio instance, the repo ZZZ gets cloned into the folder AAA, ready to work. If I alter the code on the instance, I can push my changes to the repo and all that, the connections are already correctly set in the security groups (see Step 3).
