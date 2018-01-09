@@ -21,6 +21,15 @@
     </item>
     
     <item>
+      <title>D3.js</title>
+      <link>/categories/d3.js/</link>
+      <pubDate>Tue, 09 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/d3.js/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Features</title>
       <link>/categories/features/</link>
       <pubDate>Thu, 28 May 2015 00:00:00 +0000</pubDate>
@@ -32,7 +41,7 @@
     <item>
       <title>R</title>
       <link>/categories/r/</link>
-      <pubDate>Fri, 05 Jan 2018 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 09 Jan 2018 00:00:00 +0000</pubDate>
       
       <guid>/categories/r/</guid>
       <description></description>
@@ -44,6 +53,15 @@
       <pubDate>Mon, 15 Jun 2015 00:00:00 +0000</pubDate>
       
       <guid>/categories/releases/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Sql</title>
+      <link>/categories/sql/</link>
+      <pubDate>Tue, 09 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/sql/</guid>
       <description></description>
     </item>
     

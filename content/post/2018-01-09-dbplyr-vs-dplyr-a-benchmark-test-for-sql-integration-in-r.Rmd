@@ -1,0 +1,13 @@
+---
+title: 'Dbplyr vs dplyr: A benchmark test for SQL integration in R'
+author: Sebastian Schweer
+date: '2018-01-09'
+slug: dbplyr-vs-dplyr-sql-integration-in-r
+categories:
+  - R
+  - SQL
+tags:
+  - Benchmarking
+  - Databases
+---
+
