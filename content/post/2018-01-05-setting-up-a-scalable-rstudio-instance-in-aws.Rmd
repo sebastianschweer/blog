@@ -108,7 +108,17 @@ After finally launching your instance let’s now check out the `EC2 Instances`,
 
 [![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
 
-Now is the time to tell you about
+The public IP (in the red circle) is the IP under which the instance can be reached with the browser. Opening the IP in the browser brings us to the following login page:
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+
+And, using our credentials from Step 4a, we finally arrive at the finish line:
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+
+This is now the front-end to a fully functioning Linux environment with the newest versions of R, Python, Julia etc. so that In other words: Congratulations, you now have a state-of-the-art Data Science Environment at your command. Use it wisely ;) If you want to see what kind of wonders you can do with this setup, check out the upcoming blog post YYYY. If you just want to get to know `R`with simple first steps, check out this wonderful introduction: XXXX.
+
+Before you go, though, let me tell you about
 
 ### Last Step (After Each AWS Usage): Shutting Down
 An AWS instance doesn’t shut down by itself, or go into hibernation or anything like that. It just keeps running unless otherwise specified, eventually costing lots of money (even the free tier services have their prices after some limit). So, let me show you how to shut down your brand new machine. It’s quite simple, just right-click on the running instance and choose *terminate*.
@@ -132,3 +142,19 @@ After configuring your AWS environment as decried above, your new ‚Data Scienc
 4. Log in to the Machine in the Browser,
 5. Do Awesome Data Science,
 6. Shut Down Machine and all Resources.
+
+Have fun, and remember: Primere non nocere ;)
+
+
+
+########## Next article ##########
+
+In the post XXXX I have shown you how to setup an AWS instance running the newest RStudio, R, python, Julia and so forth, where the choice of performance of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](...why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!)
+
+These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. 
+
+Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations.
+
+But we*re doing data science, right? So why not create a programmatic test in order to gauge the performance empricalley?
