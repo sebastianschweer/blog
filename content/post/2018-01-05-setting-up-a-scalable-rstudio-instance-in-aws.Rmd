@@ -171,26 +171,31 @@ So that each run of the script returns N measurements:
 
 ## The Candidates
 
-For this test I choose ....
+AWS provides a large number of different configurations, and I will not discuss all of these in this post. Rather, let me focus on four different specifications of computing resource demands and chose a distinctive representative:
+- General: t2
+- Compute Optimization: c5
+- Memory Optimized: x1
+- Accelerated Computing: p2
 
+For each of these classes, I had planned to test the sizes small, medium, large, xlarge and 2xlarge. The sizes micro, small and medium are actually only available for t2 (oh, no!), so that I ended up only testing 14 configurations. 
 
 ## The results
 
-I started with the candidate `t2.micro`. Unfortunately, after the installation the script ran into the following error
+I started with the candidate `t2.small`. Unfortunately, after the installation the script ran into the following error
 
 [![Screenshot_Finish Button](/img/screenshot_finish_button.png)](Huh.)
 
 The error essentially says “Not enough RAM on the machine”. I decided not to alter the script for the test in order to accommodate for smaller RAM sizes (I could have limited the number of used words in the model, for instance) since this test is aimed at situations where scalability is important. A “not possible” result is still a useful result for choosing the right infrastructure.
 
-Anyways, let’s proceed with the results, first in plain numbers:
+A similar thing happened in t2.medium, here the RAM was depleted by the time the validation vectors were defined. In the  Anyways, let’s proceed with the results, first in plain numbers:
 
 ```{r echo=FALSE}
 benchmark_df <- 
-data.frame( instance_class = c(“t2”,
-            instance_name  = c(“micro”,
-            price          = c(0,
-            duration_bm    = c(NA,
-            loss_bm        = c(NA,
-            accuracy_bm    = c(NA,    
+data.frame( instance_class = c(“t2”, “t2”, “t2”, “t2”, “t2”, “c5“, “c5“, “c5“, “x1“, “x1“, “x1“, “p2“, “p2“, “p2“,) 
+            instance_name  = c(“small”, “medium”, “large”, “xlarge”, “2xlarge”, “large”, “xlarge”, “2xlarge”, “large”, “xlarge”, “2xlarge”, “large”, “xlarge”, “2xlarge”) 
+            price_per_hour = c(0.0268, 0.0536, 0.1072, 0.2144, 0.4288, NA, NA, NA, NA, NA, NA, 
+            duration_bm    = c(NA, NA, 0.04707, 0.0118866, 0.0114697,
+            loss_bm        = c(NA, NA, NA, 0.5165, 0.5150,
+            accuracy_bm    = c(NA, NA, NA, 0.8567, 0.8572,
 stringsAsFactors = FALSE)
 ``` 
