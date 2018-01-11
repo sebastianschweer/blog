@@ -143,7 +143,7 @@ After configuring your AWS environment as decried above, your new ‚Data Scienc
 5. Do Awesome Data Science,
 6. Shut Down Machine and all Resources.
 
-Have fun, and remember: Primere non nocere ;)
+Have fun, and remember: Primere non nocere!
 
 
 
@@ -155,6 +155,42 @@ In the post XXXX I have shown you how to setup an AWS instance running the newes
 
 These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. 
 
-Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations.
+Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!
 
-But we*re doing data science, right? So why not create a programmatic test in order to gauge the performance empricalley?
+## The Test
+For this benchmark test I chose the following task for each of the instances to complete: Using the `keras`Library of YYY, classify the sentiment in 100000 imdb recessions into positive and negative and display the results. The code for the benchmark test can be downloaded here UZZZ was taken entirely from this wonderful blog post: ZZZ For those interested, the script trains a 3-layer (16,64,16) feed-forward Neural Network on the vectorized text data, and additionally calculates the metrics on a validation data set for each epoch. 
+
+I Supplied the original code with a little addition: The last lines read
+```{r}
+Print(difftime(xx,yay) 
+```
+So that each run of the script returns N measurements:
+1. Time: The time elapsed since starting the script (excluding the time to install the libraries and download of the data),
+2. Accuracy of model,
+3. Loss of model.
+
+## The Candidates
+
+For this test I choose ....
+
+
+## The results
+
+I started with the candidate `t2.micro`. Unfortunately, after the installation the script ran into the following error
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](Huh.)
+
+The error essentially says “Not enough RAM on the machine”. I decided not to alter the script for the test in order to accommodate for smaller RAM sizes (I could have limited the number of used words in the model, for instance) since this test is aimed at situations where scalability is important. A “not possible” result is still a useful result for choosing the right infrastructure.
+
+Anyways, let’s proceed with the results, first in plain numbers:
+
+```{r echo=FALSE}
+benchmark_df <- 
+data.frame( instance_class = c(“t2”,
+            instance_name  = c(“micro”,
+            price          = c(0,
+            duration_bm    = c(NA,
+            loss_bm        = c(NA,
+            accuracy_bm    = c(NA,    
+stringsAsFactors = FALSE)
+``` 
