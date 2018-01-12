@@ -30,15 +30,6 @@
     </item>
     
     <item>
-      <title>Features</title>
-      <link>/categories/features/</link>
-      <pubDate>Thu, 28 May 2015 00:00:00 +0000</pubDate>
-      
-      <guid>/categories/features/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Keras</title>
       <link>/categories/keras/</link>
       <pubDate>Fri, 12 Jan 2018 00:00:00 +0000</pubDate>
@@ -57,29 +48,11 @@
     </item>
     
     <item>
-      <title>Releases</title>
-      <link>/categories/releases/</link>
-      <pubDate>Mon, 15 Jun 2015 00:00:00 +0000</pubDate>
-      
-      <guid>/categories/releases/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Sql</title>
       <link>/categories/sql/</link>
       <pubDate>Tue, 09 Jan 2018 00:00:00 +0000</pubDate>
       
       <guid>/categories/sql/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Tranquilpeak</title>
-      <link>/categories/tranquilpeak/</link>
-      <pubDate>Mon, 15 Jun 2015 00:00:00 +0000</pubDate>
-      
-      <guid>/categories/tranquilpeak/</guid>
       <description></description>
     </item>
     
