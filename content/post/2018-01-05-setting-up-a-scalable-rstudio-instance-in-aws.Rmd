@@ -86,7 +86,7 @@ CODE
 git clone https://github.com/sebastianschweer/sastibe.git /home/rstudio/sastibe
 chmod -R 777 /home/rstudio/sastibe
 CODE
-and running the encoding steps as in Step 4a. Now, each time I start up a new RStudio instance, the repo `sastibe` gets cloned into the folder /home/rstudio/sastibe, which is automatically loaded in RStudio. If I alter the code on the instance, I can push my changes to the repo and all that, the connections are already correctly set in the security groups (see Step 3).
+and running the encoding steps as in Step 4a. Now, each time I start up a new RStudio instance, the repo `sastibe` gets cloned into the folder /home/rstudio/sastibe, which is automatically loaded in RStudio. The line with `chmod` ensures that any user (not just root, who is executing this command at startup) has the rights to alter content in that folder. This permission allows me to change code and pushing my changes to the repo and all that, which is just super convenient.
 
 Now, we are ready for our first test run. We start our wonderful new machine by hitting the start button:
 
