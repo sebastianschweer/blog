@@ -33,7 +33,7 @@ First a short overview of the main steps covered in this blog post:
 3. Configure the security group for your RStudio instance,
 4. Create a launch template in AWS,
 4a. Incorporate a clone of your GitHub repo, 
-5. Run a super-sophisticated algorithm on our spankingly new machine.
+5. Shut down the Instance and all Resources.
 
 Preconditions for this tutorial should be basically none, at least in terms of coding and/or understanding `R` itself. The main task will lie in clicking the right buttons.
 
@@ -71,24 +71,80 @@ there are two small (optional) additions that can be handled with the so-called 
 
 ### Step 4a: Resetting the RStudio password
 
-In the documentation of the RStudio AMI we can find the following passage: „It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there“. Alright, fine, but it bothers me to have to do that EVERY SINGLE TIME I log on. There‘s a nicer way to do this, and "User data" provides just the framework: All commands placed here get executed at the beginning of the start-up. Thus, we only need to run the code to change the password for the user RStudio:
-CODE
-$ echo "rstudio:guest" | sudo chpasswd
-CODE,
-Unfortunately, AWS XXX understands only BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. In Linux, this is as simple as 
+In the documentation of the RStudio AMI we can find the following passage: „It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there". Alright, fine, but it bothers me to have to do that EVERY SINGLE TIME I log on. There‘s a nicer way to do this, and "User data" provides just the framework: All commands placed here get executed at the beginning of the start-up. Thus, we only need to run the following code to change the password for the user RStudio:
 CODE
 #!/bin/bash
-echo -n "rstudio:guest" | chpasswd
+echo "rstudio:guest" | chpasswd
 CODE,
-Another option is to do it browser-based over here: https://www.base64encode.org/
+where you should replace the password "guest" with whatever you deem appropriate. Unfortunately, AWS "User data" only understands BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. This can be done online right here: https://www.base64encode.org/. In Ubuntu, there is also a simple alternative command ´base64‘. We are almost done with the set-up now, there only remains 
 
-We are almost done with the set-up now, there only remains 
+### Step 4b (optional): Automatically Clone a GitHub repo
 
-### Step 4b: Automatically Clone a GitHub repo
-
-I write all my private code projects on my GitHub account (here: YYY. What a shameless plug) and I also would like my code to be available for me each time I start up my RStudio instance. Fortunately, this is easily configured with "User data" again, by just adding the commands 
+I write all my private code projects on my GitHub account (here: https://github.com/sebastianschweer. What a shameless self-plug!) and I also would like my code to be available for me each time I start up my RStudio instance. Fortunately, this is easily configured with "User data" again, by just adding the command
 
 CODE
 git clone https://github.com/sebastianschweer/sastibe.git /home/rstudio/sastibe
+chmod -R 777 /home/rstudio/sastibe
 CODE
-and running the encoding steps as in Step 4a. Now, each time I start up a new RStudio instance, the repo ZZZ gets cloned into the folder AAA, ready to work. If I alter the code on the instance, I can push my changes to the repo and all that, the connections are already correctly set in the security groups (see Step 3).
+and running the encoding steps as in Step 4a. Now, each time I start up a new RStudio instance, the repo `sastibe` gets cloned into the folder /home/rstudio/sastibe, which is automatically loaded in RStudio. If I alter the code on the instance, I can push my changes to the repo and all that, the connections are already correctly set in the security groups (see Step 3).
+
+Now, we are ready for our first test run. We start our wonderful new machine by hitting the start button:
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+
+AWS now asks us to choose the size of the machine: 
+
+[![Screenshot_Machine Selection](/img/screenshot_xxx)],
+And the number of possibilities seems endless. I have created a list of choice examples to use here:
+
+
+```{r}
+benchmark_df <- 
+data.frame( instance_class = c("t2", "t2", "t2", "t2", "t2", "c5", "c5", "c5", "x1", "x1", "x1", "p2", "p2", "p2"),
+            instance_name  = c("small", "medium", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge"), 
+            price_per_hour = c(0.0268, 0.0536, 0.1072, 0.2144, 0.4288, NA, NA, NA, NA, NA, NA, NA, NA, NA),
+stringsAsFactors = FALSE)
+``` 
+
+The performance of these machines is benchmarked in an upcoming blogpost <LINK>, but as an overall recommendation I suggest to start with the t2.micro machine. Its performance is good enough for most use cases, yet it is still in the free tier.
+
+After finally launching your instance let’s now check out the `EC2 Instances`, you should see something like this:
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+
+The public IP (in the red circle) is the IP under which the instance can be reached with the browser. Opening the IP in the browser brings us to the following login page:
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+
+And, using our credentials from Step 4a, we finally arrive at the finish line:
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+
+This is now the front-end to a fully functioning Linux environment with the newest versions of R, Python, Julia etc. so that In other words: Congratulations, you now have a state-of-the-art Data Science Environment at your command. Use it wisely ;) If you want to see what kind of wonders you can do with this setup, check out the upcoming blog post YYYY. If you just want to get to know `R`with simple first steps, check out this wonderful introduction: XXXX.
+
+Before you go, though, let me tell you about
+
+### Last Step (After Each AWS Usage): Shutting Down
+An AWS instance doesn’t shut down by itself, or go into hibernation or anything like that. It just keeps running unless otherwise specified, eventually costing lots of money (even the free tier services have their prices after some limit). So, let me show you how to shut down your brand new machine. It’s quite simple, just right-click on the running instance and choose *terminate*.
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+
+Since our instance also automatically loaded an EBS volume (like a hard disk to save data), we need to shut that down too. Choose the entry EBS volumes in the sidepane and *Detach* all volumes that are active. If your overview in the Dashboard looks similar to this :
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+
+There are no hidden services running racking up costs.
+
+
+# Summary
+
+After configuring your AWS environment as decried above, your new ‚Data Science Workflow‘ can look like this:
+
+1. Log in to AWS,
+2. Start Launch Template,
+3. Choose the Appropriate Machine,
+4. Log in to the Machine in the Browser,
+5. Do Awesome Data Science,
+6. Shut Down Machine and all Resources.
+
+Have fun, and remember: Primere non nocere!

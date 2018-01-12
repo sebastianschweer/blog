@@ -1,0 +1,70 @@
+---
+title: Benchmarking AWS Instances with a Keras Script in R
+author: Sebastian Schweer
+date: '2018-01-12'
+slug: benchmarking-aws-instances
+categories:
+  - AWS
+  - R
+  - Keras
+tags:
+  - Benchmarking
+  - RStudio AMI
+  - Machine Learning
+---
+
+
+
+<p>In the post XXXX I have shown you how to setup an AWS instance running the newest RStudio, R, python, Julia and so forth, where the choice of performance of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:</p>
+<p><a href="...why%20is%20it%20‚nano‘,%20‚micro‘%20but%20then%20‚large‘%20‚extra%20large‘?%20Be%20consistent,%20dangit!"><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
+<p>These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance.</p>
+<p>Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!</p>
+<div id="the-test" class="section level2">
+<h2>The Test</h2>
+<p>For this benchmark test I chose the following task for each of the instances to complete: Using the <code>keras</code>Library of YYY, classify the sentiment in 100000 imdb recessions into positive and negative and display the results. The code for the benchmark test can be downloaded here UZZZ was taken entirely from this wonderful blog post: ZZZ For those interested, the script trains a 3-layer (16,64,16) feed-forward Neural Network on the vectorized text data, and additionally calculates the metrics on a validation data set for each epoch.</p>
+<p>I Supplied the original code with a little addition: The last lines read</p>
+<p>So that each run of the script returns N measurements: 1. Time: The time elapsed since starting the script (excluding the time to install the libraries and download of the data), 2. Accuracy of model, 3. Loss of model.</p>
+</div>
+<div id="the-candidates" class="section level2">
+<h2>The Candidates</h2>
+<p>AWS provides a large number of different configurations, and I will not discuss all of these in this post. Rather, let me focus on four different specifications of computing resource demands and chose a distinctive representative: - General: t2 - Compute Optimization: c5 - Memory Optimized: x1 - Accelerated Computing: p2</p>
+<p>For each of these classes, I had planned to test the sizes small, medium, large, xlarge and 2xlarge. The sizes micro, small and medium are actually only available for t2 (oh, no!), so that I ended up only testing 14 configurations.</p>
+</div>
+<div id="the-results" class="section level2">
+<h2>The results</h2>
+<p>I started with the candidate <code>t2.small</code>. Unfortunately, after the installation the script ran into the following error</p>
+<p><a href="Huh."><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
+<p>The error essentially says “Not enough RAM on the machine”. I decided not to alter the script for the test in order to accommodate for smaller RAM sizes (I could have limited the number of used words in the model, for instance) since this test is aimed at situations where scalability is important. A “not possible” result is still a useful result for choosing the right infrastructure.</p>
+<p>A similar thing happened in t2.medium, here the RAM was depleted by the time the validation vectors were defined. In the Anyways, let’s proceed with the results, first in plain numbers:</p>
+<pre class="r"><code>print(benchmark_df)</code></pre>
+<pre><code>##    instance_class instance_name price_per_hour duration_bm loss_bm
+## 1              t2         small         0.0268          NA      NA
+## 2              t2        medium         0.0536          NA      NA
+## 3              t2         large         0.1072   0.0470700      NA
+## 4              t2        xlarge         0.2144   0.0118866  0.5165
+## 5              t2       2xlarge         0.4288   0.0114697  0.5150
+## 6              c5         large             NA          NA      NA
+## 7              c5        xlarge             NA          NA      NA
+## 8              c5       2xlarge             NA          NA      NA
+## 9              x1         large             NA          NA      NA
+## 10             x1        xlarge             NA          NA      NA
+## 11             x1       2xlarge             NA          NA      NA
+## 12             p2         large             NA          NA      NA
+## 13             p2        xlarge             NA          NA      NA
+## 14             p2       2xlarge             NA          NA      NA
+##    accuracy_bm
+## 1           NA
+## 2           NA
+## 3           NA
+## 4       0.8567
+## 5       0.8572
+## 6           NA
+## 7           NA
+## 8           NA
+## 9           NA
+## 10          NA
+## 11          NA
+## 12          NA
+## 13          NA
+## 14          NA</code></pre>
+</div>

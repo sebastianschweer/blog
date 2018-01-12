@@ -1,0 +1,68 @@
+---
+title: Benchmarking AWS Instances with a Keras Script in R
+author: Sebastian Schweer
+date: '2018-01-12'
+slug: benchmarking-aws-instances
+categories:
+  - AWS
+  - R
+  - Keras
+tags:
+  - Benchmarking
+  - RStudio AMI
+  - Machine Learning
+---
+
+
+In the post XXXX I have shown you how to setup an AWS instance running the newest RStudio, R, python, Julia and so forth, where the choice of performance of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](...why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!)
+
+These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. 
+
+Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!
+
+## The Test
+For this benchmark test I chose the following task for each of the instances to complete: Using the `keras`Library of YYY, classify the sentiment in 100000 imdb recessions into positive and negative and display the results. The code for the benchmark test can be downloaded here UZZZ was taken entirely from this wonderful blog post: ZZZ For those interested, the script trains a 3-layer (16,64,16) feed-forward Neural Network on the vectorized text data, and additionally calculates the metrics on a validation data set for each epoch. 
+
+I Supplied the original code with a little addition: The last lines read
+
+So that each run of the script returns N measurements:
+1. Time: The time elapsed since starting the script (excluding the time to install the libraries and download of the data),
+2. Accuracy of model,
+3. Loss of model.
+
+## The Candidates
+
+AWS provides a large number of different configurations, and I will not discuss all of these in this post. Rather, let me focus on four different specifications of computing resource demands and chose a distinctive representative:
+- General: t2
+- Compute Optimization: c5
+- Memory Optimized: x1
+- Accelerated Computing: p2
+
+For each of these classes, I had planned to test the sizes small, medium, large, xlarge and 2xlarge. The sizes micro, small and medium are actually only available for t2 (oh, no!), so that I ended up only testing 14 configurations. 
+
+## The results
+
+I started with the candidate `t2.small`. Unfortunately, after the installation the script ran into the following error
+
+[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](Huh.)
+
+The error essentially says "Not enough RAM on the machine". I decided not to alter the script for the test in order to accommodate for smaller RAM sizes (I could have limited the number of used words in the model, for instance) since this test is aimed at situations where scalability is important. A "not possible" result is still a useful result for choosing the right infrastructure.
+
+A similar thing happened in t2.medium, here the RAM was depleted by the time the validation vectors were defined. In the  Anyways, let’s proceed with the results, first in plain numbers:
+
+```{r echo=FALSE}
+benchmark_df <- 
+data.frame( instance_class = c("t2", "t2", "t2", "t2", "t2", "c5", "c5", "c5", "x1", "x1", "x1", "p2", "p2", "p2"),
+            instance_name  = c("small", "medium", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge"), 
+            price_per_hour = c(0.0268, 0.0536, 0.1072, 0.2144, 0.4288, NA, NA, NA, NA, NA, NA, NA, NA, NA), 
+            duration_bm    = c(NA, NA, 0.04707, 0.0118866, 0.0114697,NA, NA, NA, NA, NA, NA, NA, NA, NA),
+            loss_bm        = c(NA, NA, NA, 0.5165, 0.5150, NA, NA, NA, NA, NA, NA, NA, NA, NA), 
+            accuracy_bm    = c(NA, NA, NA, 0.8567, 0.8572, NA, NA, NA, NA, NA, NA, NA, NA, NA),
+stringsAsFactors = FALSE)
+```
+
+```{r}
+print(benchmark_df)
+```

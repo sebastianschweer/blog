@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>R on Hugo tranquilpeak theme</title>
+    <title>R on Sebastian Schweer&#39;s Private Blog</title>
     <link>/categories/r/</link>
-    <description>Recent content in R on Hugo tranquilpeak theme</description>
+    <description>Recent content in R on Sebastian Schweer&#39;s Private Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 09 Jan 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 12 Jan 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Benchmarking AWS Instances with a Keras Script in R</title>
+      <link>/2018/01/benchmarking-aws-instances/</link>
+      <pubDate>Fri, 12 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/01/benchmarking-aws-instances/</guid>
+      <description>In the post XXXX I have shown you how to setup an AWS instance running the newest RStudio, R, python, Julia and so forth, where the choice of performance of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:
+
+These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance.</description>
+    </item>
     
     <item>
       <title>Dbplyr vs dplyr: A benchmark test for SQL integration in R</title>
