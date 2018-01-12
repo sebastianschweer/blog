@@ -71,19 +71,20 @@ there are two small (optional) additions that can be handled with the so-called 
 
 ### Step 4a: Resetting the RStudio password
 
-In the documentation of the RStudio AMI we can find the following passage: „It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there“. Alright, fine, but it bothers me to have to do that EVERY SINGLE TIME I log on. There‘s a nicer way to do this, and "User data" provides just the framework: All commands placed here get executed at the beginning of the start-up. Thus, we only need to run the following code to change the password for the user RStudio:
+In the documentation of the RStudio AMI we can find the following passage: „It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there". Alright, fine, but it bothers me to have to do that EVERY SINGLE TIME I log on. There‘s a nicer way to do this, and "User data" provides just the framework: All commands placed here get executed at the beginning of the start-up. Thus, we only need to run the following code to change the password for the user RStudio:
 CODE
 #!/bin/bash
-$ echo "rstudio:guest" | sudo chpasswd
+echo "rstudio:guest" | chpasswd
 CODE,
-Unfortunately, AWS XXX understands only BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. This can be done online right here: https://www.base64encode.org/. In Ubuntu, there is also a simple alternative command ´base64‘. We are almost done with the set-up now, there only remains 
+where you should replace the password "guest" with whatever you deem appropriate. Unfortunately, AWS "User data" only understands BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. This can be done online right here: https://www.base64encode.org/. In Ubuntu, there is also a simple alternative command ´base64‘. We are almost done with the set-up now, there only remains 
 
 ### Step 4b (optional): Automatically Clone a GitHub repo
 
-I write all my private code projects on my GitHub account (here: https://github.com/sebastianschweer. What a shameless plug) and I also would like my code to be available for me each time I start up my RStudio instance. Fortunately, this is easily configured with "User data" again, by just adding the command
+I write all my private code projects on my GitHub account (here: https://github.com/sebastianschweer. What a shameless self-plug!) and I also would like my code to be available for me each time I start up my RStudio instance. Fortunately, this is easily configured with "User data" again, by just adding the command
 
 CODE
 git clone https://github.com/sebastianschweer/sastibe.git /home/rstudio/sastibe
+chmod -R 777 /home/rstudio/sastibe
 CODE
 and running the encoding steps as in Step 4a. Now, each time I start up a new RStudio instance, the repo `sastibe` gets cloned into the folder /home/rstudio/sastibe, which is automatically loaded in RStudio. If I alter the code on the instance, I can push my changes to the repo and all that, the connections are already correctly set in the security groups (see Step 3).
 
@@ -96,11 +97,14 @@ AWS now asks us to choose the size of the machine:
 [![Screenshot_Machine Selection](/img/screenshot_xxx)],
 And the number of possibilities seems endless. I have created a list of choice examples to use here:
 
-|  Machine Name  | RAM | CPUs | Price |
-|:—————:|——————|——————|——|
-| t2.micro | 8 GB | No clue | 0 € |
-| t2.nano | 8 GB | No clue | 0 € |
-| t2.large | 8 GB | No clue | 0 € |
+
+```{r}
+benchmark_df <- 
+data.frame( instance_class = c("t2", "t2", "t2", "t2", "t2", "c5", "c5", "c5", "x1", "x1", "x1", "p2", "p2", "p2"),
+            instance_name  = c("small", "medium", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge"), 
+            price_per_hour = c(0.0268, 0.0536, 0.1072, 0.2144, 0.4288, NA, NA, NA, NA, NA, NA, NA, NA, NA),
+stringsAsFactors = FALSE)
+``` 
 
 The performance of these machines is benchmarked in an upcoming blogpost <LINK>, but as an overall recommendation I suggest to start with the t2.micro machine. Its performance is good enough for most use cases, yet it is still in the free tier.
 
@@ -144,58 +148,3 @@ After configuring your AWS environment as decried above, your new ‚Data Scienc
 6. Shut Down Machine and all Resources.
 
 Have fun, and remember: Primere non nocere!
-
-
-
-########## Next article ##########
-
-In the post XXXX I have shown you how to setup an AWS instance running the newest RStudio, R, python, Julia and so forth, where the choice of performance of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:
-
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](...why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!)
-
-These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. 
-
-Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!
-
-## The Test
-For this benchmark test I chose the following task for each of the instances to complete: Using the `keras`Library of YYY, classify the sentiment in 100000 imdb recessions into positive and negative and display the results. The code for the benchmark test can be downloaded here UZZZ was taken entirely from this wonderful blog post: ZZZ For those interested, the script trains a 3-layer (16,64,16) feed-forward Neural Network on the vectorized text data, and additionally calculates the metrics on a validation data set for each epoch. 
-
-I Supplied the original code with a little addition: The last lines read
-```{r}
-Print(difftime(xx,yay) 
-```
-So that each run of the script returns N measurements:
-1. Time: The time elapsed since starting the script (excluding the time to install the libraries and download of the data),
-2. Accuracy of model,
-3. Loss of model.
-
-## The Candidates
-
-AWS provides a large number of different configurations, and I will not discuss all of these in this post. Rather, let me focus on four different specifications of computing resource demands and chose a distinctive representative:
-- General: t2
-- Compute Optimization: c5
-- Memory Optimized: x1
-- Accelerated Computing: p2
-
-For each of these classes, I had planned to test the sizes small, medium, large, xlarge and 2xlarge. The sizes micro, small and medium are actually only available for t2 (oh, no!), so that I ended up only testing 14 configurations. 
-
-## The results
-
-I started with the candidate `t2.small`. Unfortunately, after the installation the script ran into the following error
-
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](Huh.)
-
-The error essentially says “Not enough RAM on the machine”. I decided not to alter the script for the test in order to accommodate for smaller RAM sizes (I could have limited the number of used words in the model, for instance) since this test is aimed at situations where scalability is important. A “not possible” result is still a useful result for choosing the right infrastructure.
-
-A similar thing happened in t2.medium, here the RAM was depleted by the time the validation vectors were defined. In the  Anyways, let’s proceed with the results, first in plain numbers:
-
-```{r echo=FALSE}
-benchmark_df <- 
-data.frame( instance_class = c(“t2”, “t2”, “t2”, “t2”, “t2”, “c5“, “c5“, “c5“, “x1“, “x1“, “x1“, “p2“, “p2“, “p2“,) 
-            instance_name  = c(“small”, “medium”, “large”, “xlarge”, “2xlarge”, “large”, “xlarge”, “2xlarge”, “large”, “xlarge”, “2xlarge”, “large”, “xlarge”, “2xlarge”) 
-            price_per_hour = c(0.0268, 0.0536, 0.1072, 0.2144, 0.4288, NA, NA, NA, NA, NA, NA, 
-            duration_bm    = c(NA, NA, 0.04707, 0.0118866, 0.0114697,
-            loss_bm        = c(NA, NA, NA, 0.5165, 0.5150,
-            accuracy_bm    = c(NA, NA, NA, 0.8567, 0.8572,
-stringsAsFactors = FALSE)
-``` 
