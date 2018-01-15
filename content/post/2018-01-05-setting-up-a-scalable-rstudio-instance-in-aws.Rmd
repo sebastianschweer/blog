@@ -24,7 +24,7 @@ Indeed it would be! (I love rhethorical questions...) In this post, I will show 
 
 Convinced? Awesome, let's get started!
 
-## Overview of main steps
+# Overview of main steps
 
 First a short overview of the main steps covered in this blog post:
 
@@ -37,13 +37,13 @@ First a short overview of the main steps covered in this blog post:
 
 Preconditions for this tutorial should be basically none, at least in terms of coding and/or understanding `R` itself. The main task will lie in clicking the right buttons.
 
-### Step 1: Get an AWS account.
+## Step 1: Get an AWS account.
 
-Well, it isn't really my place to tell you how to get an AWS account if Amazon itself did such a great job explaining it <https://aws.amazon.com/resources/create-account/>. Just use the link to set up your account, and I further suggest to follow the following set of instructions <https://aws.amazon.com/getting-started/tutorials/launch-a-virtual-machine/>, building your very first instance. Take your time going through these instructions, I'll wait...
+Well, it isn't really my place to tell you how to get an AWS account if Amazon itself did [such a great job explaining it](https://aws.amazon.com/resources/create-account/). Just use the link to set up your account, and I further suggest to follow [this set of instructions](https://aws.amazon.com/getting-started/tutorials/launch-a-virtual-machine/), building your very first instance. Take your time going through these instructions, I'll wait...
 
 Ready? Alright, sweet. Then we continue with 
 
-### Step 2: Find the current RStudio AMI.
+## Step 2: Find the current RStudio AMI.
 
 AMI stands for Amazon Machine Images, which is like an operating system container. More to the point, in an AMI a Linux distribution can be bundled with addtional software packages tailored to any type of need: web development, accounting (I'm guessing here, but ... sure) and, most importantly, using RStudio. [On Louis Anslett'S homepage](http://www.louisaslett.com/RStudio_AMI/) you can find a wonderful storage of RStudio AMIs. We use the newest version for the correct geographical zone, in my case Frankfurt:
 
@@ -53,7 +53,7 @@ As you can see, thanks to Louis Anslett’s work, the AMI includes not only the 
 
 ### Step 3: Configure the security groups for your RStudio instance
 
-In AWS, security groups LINK:https://docs.aws.amazon.com/en_en/AWSEC2/latest/UserGuide/using-network-security.html control the access to the machine over the internet (if you don‘t care about how exactly this works and only want to follow the instructions, just skip the next sentences). More precisely, they define which kind of protocols may use which ports on your machine from a given IP range. For example, you can set the access rights for a ssh protocol to be able to connect to your machine on port 22 only from your personal IP address at home. 
+In AWS, [security groups](https://docs.aws.amazon.com/en_en/AWSEC2/latest/UserGuide/using-network-security.html) control the access to the machine over the internet (if you don‘t care about how exactly this works and only want to follow the instructions, just skip the next sentences). More precisely, they define which kind of protocols may use which ports on your machine from a given IP range. For example, you can set the access rights for a ssh protocol to be able to connect to your machine on port 22 only from your personal IP address at home. 
 
 In our case, we actually only need access via http protocol, since the RStudio instance will allow log-in via browser interface. Therefore, our security group can be kept quite simple:
 
@@ -61,7 +61,7 @@ In our case, we actually only need access via http protocol, since the RStudio i
 
 The IP range can be limited to your own personal IP to ensure the safety of your instance. This precaution could be necessary since only the login page of RStudio stands between the internet and your instance (spooky, huh?). However, since the personal IP usually changes each day (roughly speaking), this becomes a personal question of "privacy vs. convenience". In my case, as you can see, convenience won.
 
-### Step 4: Create a launch template in AWS
+## Step 4: Create a launch template in AWS
 
 We now configure a launch template in AWS to simplify the process of starting up our RStudio instance in the future. This step is not entirely necessary, but I highly recommend it due to its simplicity and benefits. Begin by starting the launch template wizard on the AWS Dashboard Side Panel. The only things necessary for the set-up are the AMI of step 2 and the security groups from step 3 (see how neatly this all ties together? Almost as if somebody thought it through...). The only thing left to do is to choose the type of instance to start by default. I recommend to set the lowest ranking instance by default: It is still capable of running basic analyses, yet it doesn‘t cost a thing. Before clicking the finish button:
 
@@ -69,7 +69,7 @@ We now configure a launch template in AWS to simplify the process of starting up
 
 there are two small (optional) additions that can be handled with the so-called "User data" in the advanced details  Why exactly this is called "user data", I'm not entirely sure, but as long as it is useful, I don't really care.
 
-### Step 4a: Resetting the RStudio password
+## Step 4a: Resetting the RStudio password
 
 In the documentation of the RStudio AMI we can find the following passage: „It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there". Alright, fine, but it bothers me to have to do that EVERY SINGLE TIME I log on. There‘s a nicer way to do this, and "User data" provides just the framework: All commands placed here get executed at the beginning of the start-up. Thus, we only need to run the following code to change the password for the user RStudio:
 ```{r eval=FALSE}
@@ -78,7 +78,7 @@ echo "rstudio:guest" | chpasswd
 ```
 where you should replace the password "guest" with whatever you deem appropriate. Unfortunately, AWS "User data" only understands BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. This can be done online right [here](https://www.base64encode.org/). In Ubuntu, there is also a simple alternative command ´base64‘. We are almost done with the set-up now, there only remains 
 
-### Step 4b (optional): Automatically Clone a GitHub repo
+## Step 4b (optional): Automatically Clone a GitHub repo
 
 I write all my private code projects on my GitHub account (here: https://github.com/sebastianschweer. What a shameless self-plug!) and I also would like my code to be available for me each time I start up my RStudio instance. Fortunately, this is easily configured with "User data" again, by just adding the command
 ```{r eval=FALSE}
@@ -123,7 +123,7 @@ This is now the front-end to a fully functioning Linux environment with the newe
 
 Before you go, though, let me tell you about
 
-### Last Step (After Each AWS Usage): Shutting Down
+## Last Step (After Each AWS Usage): Shutting Down
 An AWS instance doesn’t shut down by itself, or go into hibernation or anything like that. It just keeps running unless otherwise specified, eventually costing lots of money (even the free tier services have their prices after some limit). So, let me show you how to shut down your brand new machine. It’s quite simple, just right-click on the running instance and choose *terminate*.
 
 [![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)

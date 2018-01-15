@@ -11,3 +11,29 @@ tags:
   - APIs
 ---
 
+> "I am very glad you asked me that, Mrs. Rawlinson. The term 'holistic' refers to my conviction that what we are concerned here is the fundamental interconnectedness of things."
+Douglas Adams, "Dirk Gently's Holistic Agency"
+
+Networks are *everywhere*. The internet, road infrastructure and even [the cast list of a theater show](d3 js link): depending on the interpretation, all kinds of entities can be viewed as networks. 
+
+One particularly interesting subset of networks is made up by scientific research papers. For instance, the Erdös number is calculated using a network of authors by co-authorship: If you have co-written a paper with Paul Erdös: your Erdös number is 1. Else, your Erdös number is one higher than the smallest Erdös number of any of your co-authors. If you have never written a mathematical paper, your Erdös number is, unfortunately, infinity. 
+
+A similar measurement was introduced for people starring in movies by calculating the Bacon-number, the "distance" to Kevin Bacon. Finally, the Bacon-Erdös-Number is reserved for the (rather elite) subgroup of people on this earth who have both
+* Published a scientific paper and
+* Starred in a movie.
+Apparently, the lowest Bacon-Erdös number is being held by YYY. But I digress.
+
+Another possibility of creating a network from scientific articles is looking at the citations: each paper that cites another paper creates a link between these articles. In this blog post I demonstrate how to
+
+1. Obtain the connected graph between a set of articles by using the `rCrossRef` package
+2. Visualize the results using D3.js 
+
+# Get Data from CrossRef
+
+In my days at the university, I managed to publish a handful of articles and I will use these as demonstrators in this post. First, let's install and load the library and use it to find all articles under my name:
+```{r}
+Install.packages(rcrossref)
+Library(rcrossref)
+Articles_df <- data.frame()
+Articles_df
+```
