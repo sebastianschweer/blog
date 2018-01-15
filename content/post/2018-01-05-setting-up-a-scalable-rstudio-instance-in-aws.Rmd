@@ -72,20 +72,19 @@ there are two small (optional) additions that can be handled with the so-called 
 ### Step 4a: Resetting the RStudio password
 
 In the documentation of the RStudio AMI we can find the following passage: „It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there". Alright, fine, but it bothers me to have to do that EVERY SINGLE TIME I log on. There‘s a nicer way to do this, and "User data" provides just the framework: All commands placed here get executed at the beginning of the start-up. Thus, we only need to run the following code to change the password for the user RStudio:
-CODE
+```{r eval=FALSE}
 #!/bin/bash
 echo "rstudio:guest" | chpasswd
-CODE,
+```
 where you should replace the password "guest" with whatever you deem appropriate. Unfortunately, AWS "User data" only understands BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. This can be done online right [here](https://www.base64encode.org/). In Ubuntu, there is also a simple alternative command ´base64‘. We are almost done with the set-up now, there only remains 
 
 ### Step 4b (optional): Automatically Clone a GitHub repo
 
 I write all my private code projects on my GitHub account (here: https://github.com/sebastianschweer. What a shameless self-plug!) and I also would like my code to be available for me each time I start up my RStudio instance. Fortunately, this is easily configured with "User data" again, by just adding the command
-
-CODE
+```{r eval=FALSE}
 git clone https://github.com/sebastianschweer/sastibe.git /home/rstudio/sastibe
 chmod -R 777 /home/rstudio/sastibe
-CODE
+```
 and running the encoding steps as in Step 4a. Now, each time I start up a new RStudio instance, the repo `sastibe` gets cloned into the folder /home/rstudio/sastibe, which is automatically loaded in RStudio. The line with `chmod` ensures that any user (not just root, who is executing this command at startup) has the rights to alter content in that folder. This permission allows me to change code and pushing my changes to the repo and all that, which is just super convenient.
 
 Now, we are ready for our first test run. We start our wonderful new machine by hitting the start button:
