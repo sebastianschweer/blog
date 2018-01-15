@@ -32,8 +32,11 @@ Another possibility of creating a network from scientific articles is looking at
 
 In my days at the university, I managed to publish a handful of articles and I will use these as demonstrators in this post. First, let's install and load the library and use it to find all articles under my name:
 ```{r}
-Install.packages(rcrossref)
-Library(rcrossref)
-Articles_df <- data.frame()
-Articles_df
+library("rcrossref")
+articles_df <- cr_works(flq = c(query.author="Sebastian Schweer"))$data
+articles_df[ , c("title", "DOI", "container.title", "created")]
+```
+Right, so apparently, I'm not the only "Sebastian Schweer" in the scientific world. In order to find my own works, we have to filter the entries a bit. I did my PhD research during the years 2011 until 2015, and some articles just take their time to be published. So let's just look at articles from the year 2014 until today. We find
+```{r}
+articles_df <- articles_df[ substr(articles_df$created, 1, 4) %in% c("2014","2015","2016","2017") , c("title", "DOI", "container.title", "created")]
 ```
