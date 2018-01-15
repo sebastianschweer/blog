@@ -76,7 +76,7 @@ CODE
 #!/bin/bash
 echo "rstudio:guest" | chpasswd
 CODE,
-where you should replace the password "guest" with whatever you deem appropriate. Unfortunately, AWS "User data" only understands BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. This can be done online right here: https://www.base64encode.org/. In Ubuntu, there is also a simple alternative command ´base64‘. We are almost done with the set-up now, there only remains 
+where you should replace the password "guest" with whatever you deem appropriate. Unfortunately, AWS "User data" only understands BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. This can be done online right [here](https://www.base64encode.org/). In Ubuntu, there is also a simple alternative command ´base64‘. We are almost done with the set-up now, there only remains 
 
 ### Step 4b (optional): Automatically Clone a GitHub repo
 
