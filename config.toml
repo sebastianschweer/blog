@@ -15,7 +15,7 @@
 baseURL = "https://example.org/"
 languageCode = "en-us"
 defaultContentLanguage = "en-us"
-title = "Sebastian Schweer's Private Blog"
+title = "Sastibe's Data Science Blog"
 theme = "hugo-tranquilpeak-theme"
 disqusShortname = "hugo-tranquilpeak-theme"
 # googleAnalytics = "UA-123-45"
@@ -32,7 +32,7 @@ canonifyurls = true
 
 [author]
   name = "Sebastian Schweer"
-  bio = "Statistician. Data Scientist. Fiddler."
+  bio = "Theoretiker, Ingenieur, Berater, Erzähler."
   job = "Data Analyst"
   location = "Heidelberg, Germany"
   # Your profile picture
@@ -103,7 +103,7 @@ canonifyurls = true
   # If false it will flat categories.
   hierarchicalCategories = true
 
-  description = "Sebastian Schweer's Private Blog"
+  description =  "Sastibe's Data Science Blog"
 
   # Customization
   # Define the behavior of the sidebar

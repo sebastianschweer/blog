@@ -11,28 +11,32 @@ tags:
 slug: setting-up-a-scalable-rstudio-instance-in-aws
 ---
 
-# Setting up an R Environment: Available Anytime, Anywhere?
-
  Assume you want to start to write `R` code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn't it be awesome if one could set up an environment that can be used for `R` coding independent of any device? Where all you need is a decent browser, a working internet connection and you're good to go?
  
-Indeed it would be! (I love rhethorical questions...) In this post, I will show you the steps for setting up such an environment on Amazon Web Services (AWS). The main advantages of using such a set-up:
-\itemize
-\item Runs on any infrastructure: All you need is a working internet connection, a decent browser and an AWS account, which is usually free.*Footnote: For a given value of usually. I personally try to test out lots of resources just because I can, yet even so, my total expenses for AWS result in 0.37€ (January 2018). A related point
-\item Runs everywhere: The AWS machine will be set up to automatically clone your GitHub repository (don't worry if this doesn't mean anything to you, this point is optional), so that you don't even have to have your codes on the device.
-\item Scalable: The AWS machine running your code can be chosen to suit any of your needs, in any session. Just playing around with a new package? Use the smallest size, doesn't cost a dime. Trying to re-create Google's preformance on a fancy DNN-classification? Go all in with 500 GB of RAM; it'll cost ya, but it's fun.
-\item Up-to-Date: Since the envirionment is freshly installed each time, your `R` version as well as the package versions in use are automatically up-to-date. In the latter case, that would also be easy to maintain on a local machine, the former, however, is a nice benefit. 
+Obviously, that is the case. In this post, I will show you the steps for setting up such an environment on Amazon Web Services (AWS). The main advantages of using such a set-up:
+
+
+- Runs on any infrastructure: All you need is a working internet connection, a decent browser and an AWS account, which is usually[^1] free.
+- Runs everywhere: The AWS machine will be set up to automatically clone your GitHub repository (don't worry if this doesn't mean anything to you, this point is optional), so that you don't even have to have your codes on the device.
+- Scalable: The AWS machine running your code can be chosen to suit any of your needs, in any session. Just playing around with a new package? Use the smallest size, doesn't cost a dime. Trying to re-create state-of-the-art machine learning performance with a fancy DNN-classifier? Go all in with 500 GB of RAM; it'll cost ya, but it's fun.
+- Up-to-Date: Since the envirionment is freshly installed each time, your `R` version as well as the package versions in use are automatically up-to-date. In the latter case, that would also be easy to maintain on a local machine, the former, however, is a nice benefit. 
 
 Convinced? Awesome, let's get started!
+
+[^1]: For a given value of usually. I personally try to test out lots of resources just because I can, yet even so, my total expenses for AWS result in 0.37€ (January 2018).
 
 # Overview of main steps
 
 First a short overview of the main steps covered in this blog post:
 
 1. Get an AWS account (duh!),
-2. Find the right RStudio AMI,
-3. Configure the security group for your RStudio instance,
-4. Create a launch template in AWS,
-4a. Incorporate a clone of your GitHub repo, 
+2. Configure your RStudio AMI,
+    i. Find the right RStudio AMI,
+    ii. Configure Security Groups,
+    iii. Automatically Change your RStudio Password, 
+    iv. Incorporate a clone of your GitHub repo, 
+3. Start your First RStudio instance (and bask in its glory),
+4. Create a personal AMI for future convenience,
 5. Shut down the Instance and all Resources.
 
 Preconditions for this tutorial should be basically none, at least in terms of coding and/or understanding `R` itself. The main task will lie in clicking the right buttons.
@@ -43,94 +47,90 @@ Well, it isn't really my place to tell you how to get an AWS account if Amazon i
 
 Ready? Alright, sweet. Then we continue with 
 
-## Step 2: Find the current RStudio AMI.
+## Step 2: Configure your RStudio AMI.
 
-AMI stands for Amazon Machine Images, which is like an operating system container. More to the point, in an AMI a Linux distribution can be bundled with addtional software packages tailored to any type of need: web development, accounting (I'm guessing here, but ... sure) and, most importantly, using RStudio. [On Louis Anslett'S homepage](http://www.louisaslett.com/RStudio_AMI/) you can find a wonderful storage of RStudio AMIs. We use the newest version for the correct geographical zone, in my case Frankfurt:
+In this step, I collected several steps, not all of which are necessary. Steps 2a and 2b are crucial, Step 2c is recommended. Step 2d can be skipped on the first set-up. The implementation of this step can always be re-assessed whenever it becomes necessary. 
 
-[![Screenshot_Louis_Anslett](/img/screenshot_louisaslett.png)](http://www.louisaslett.com/RStudio_AMI/)
+Let's begin by starting an instance in the AWS Dashboard. Just open "Instances" on the side menu of your EC2 Dashboard and click on "Launch Instance":
 
-As you can see, thanks to Louis Anslett’s work, the AMI includes not only the newest version of RStudio but also of `R itself as well as a handful of helpful additional software packages. For instance, Git comes pre-installed, which we will use later on; also `Julia`is installed for those looking to try out the possible future of data science languages. But I’m deviating, let’s get back on track with 
+![Here we go!](SCREENSHOT_START_INSTANCE)
 
-### Step 3: Configure the security groups for your RStudio instance
+
+### Step 2a: Find the current RStudio AMI.
+
+The first task is to choose an Amazon Machine Image, or AMI, which is essentially an operating system container. More to the point, in an AMI a Linux distribution can be bundled with addtional software packages tailored to any type of need: web development, accounting (I'm guessing here, but ... sure) and, most importantly, using RStudio. [On Louis Anslett's homepage](http://www.louisaslett.com/RStudio_AMI/) you can find a wonderful storage of RStudio AMIs. We use the newest version for the correct geographical zone, in my case Frankfurt:
+![One AMI for each region. Neat](https://res.cloudinary.com/dlprdrxib/image/upload/v1516304602/screenshot_louisaslett_eyug44.png)
+
+As you can see, thanks to Louis Anslett’s work, the AMI includes not only the newest version of RStudio but also of `R` itself as well as a handful of helpful additional software packages. For instance, Git comes pre-installed, which we will use later on; also `Julia`is installed for those looking to try out the possible future of data science languages. But I’m deviating... Let's note the AMI-ID (in our case "ami-a80db3c7"), put this in the start-up options and let's continue.
+
+### Step 2b: Configure the security groups for your RStudio instance
 
 In AWS, [security groups](https://docs.aws.amazon.com/en_en/AWSEC2/latest/UserGuide/using-network-security.html) control the access to the machine over the internet (if you don‘t care about how exactly this works and only want to follow the instructions, just skip the next sentences). More precisely, they define which kind of protocols may use which ports on your machine from a given IP range. For example, you can set the access rights for a ssh protocol to be able to connect to your machine on port 22 only from your personal IP address at home. 
 
 In our case, we actually only need access via http protocol, since the RStudio instance will allow log-in via browser interface. Therefore, our security group can be kept quite simple:
 
-[![Screenshot_Security Group](/img/screenshot_security_group.png)](https://docs.aws.amazon.com/en_en/AWSEC2/latest/UserGuide/using-network-security.html)
+![The bottom option allows the whole world to see the instance. Golly.](http://res.cloudinary.com/dlprdrxib/image/upload/v1515794260/screenshot_security_group_xy0wkr.png) 
+
+
 
 The IP range can be limited to your own personal IP to ensure the safety of your instance. This precaution could be necessary since only the login page of RStudio stands between the internet and your instance (spooky, huh?). However, since the personal IP usually changes each day (roughly speaking), this becomes a personal question of "privacy vs. convenience". In my case, as you can see, convenience won.
 
-## Step 4: Create a launch template in AWS
+### 2c. Automatically Change your RStudio Password {#step2c}
 
-We now configure a launch template in AWS to simplify the process of starting up our RStudio instance in the future. This step is not entirely necessary, but I highly recommend it due to its simplicity and benefits. Begin by starting the launch template wizard on the AWS Dashboard Side Panel. The only things necessary for the set-up are the AMI of step 2 and the security groups from step 3 (see how neatly this all ties together? Almost as if somebody thought it through...). The only thing left to do is to choose the type of instance to start by default. I recommend to set the lowest ranking instance by default: It is still capable of running basic analyses, yet it doesn‘t cost a thing. Before clicking the finish button:
+In the documentation of the RStudio AMI we can find the following passage: "It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there". Alright, fine, but I'd rather to that programmatically, i.e. automatically. The weirdly named "User data" option provides just the framework: All commands placed here get executed at the beginning of the start-up. You can find this setting in the menu "Configure Instance Details" under "Advanced Details"" like so:
 
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)]
 
-there are two small (optional) additions that can be handled with the so-called "User data" in the advanced details  Why exactly this is called "user data", I'm not entirely sure, but as long as it is useful, I don't really care.
+![Do the deep dive, yeah!](/img/screenshot_security_group.png)
 
-## Step 4a: Resetting the RStudio password
-
-In the documentation of the RStudio AMI we can find the following passage: „It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there". Alright, fine, but it bothers me to have to do that EVERY SINGLE TIME I log on. There‘s a nicer way to do this, and "User data" provides just the framework: All commands placed here get executed at the beginning of the start-up. Thus, we only need to run the following code to change the password for the user RStudio:
+In order to change the password of the user "RStudio" on start-up, we paste the following code:
 ```{r eval=FALSE}
 #!/bin/bash
 echo "rstudio:guest" | chpasswd
 ```
-where you should replace the password "guest" with whatever you deem appropriate. Unfortunately, AWS "User data" only understands BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. This can be done online right [here](https://www.base64encode.org/). In Ubuntu, there is also a simple alternative command ´base64‘. We are almost done with the set-up now, there only remains 
+where you should replace the password "guest" with whatever you deem appropriate. We are almost done with the set-up now, there only remains 
 
-## Step 4b (optional): Automatically Clone a GitHub repo
+### Step 2d (optional): Automatically Clone a GitHub repo
 
 I write all my private code projects on my GitHub account (here: https://github.com/sebastianschweer. What a shameless self-plug!) and I also would like my code to be available for me each time I start up my RStudio instance. Fortunately, this is easily configured with "User data" again, by just adding the command
 ```{r eval=FALSE}
 git clone https://github.com/sebastianschweer/sastibe.git /home/rstudio/sastibe
 chmod -R 777 /home/rstudio/sastibe
 ```
-and running the encoding steps as in Step 4a. Now, each time I start up a new RStudio instance, the repo `sastibe` gets cloned into the folder /home/rstudio/sastibe, which is automatically loaded in RStudio. The line with `chmod` ensures that any user (not just root, who is executing this command at startup) has the rights to alter content in that folder. This permission allows me to change code and pushing my changes to the repo and all that, which is just super convenient.
+to the "User data" of [Step 2c](#setp2c). Now, when I start up the new RStudio instance, the repository `sastibe` gets cloned into the folder `/home/rstudio/sastibe`, which is automatically loaded in RStudio. The line with `chmod` ensures that any user (not just root, who is executing this command at startup) has the rights to alter content in that folder. This permission allows me to change code and pushing my changes to the repository and all that, which is just super convenient.
 
-Now, we are ready for our first test run. We start our wonderful new machine by hitting the start button:
+## Step 3: Start your First RStudio instance (and bask in its glory),
 
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+The last and most exciting click is this one:
 
-AWS now asks us to choose the size of the machine: 
+![Hooray, all the hard work pays off!](/img/screenshot_finish_button.png)
 
-[![Screenshot_Machine Selection](/img/screenshot_xxx)],
-And the number of possibilities seems endless. I have created a list of choice examples to use here:
+We have now started the instance. This means that a virtual machine, configured according to our specifitcations is being run on one of Amazon's bajillion[^2] cloud computing servers. In the menu "Instances" we now see an active instance running. After we are done, we will use this menu to shut it down again (so that it doesn#t cost us), but not now: we are eager to test it out! Accessing the instance is quite easy in our case: Just copy the "IPv4 Public IP" adress and paste it in your browser:
+
+![Green lights indicate the instance runs harmoniously.](/img/screenshot_finish_button.png)
+
+Hopefully, you haven't forgotten your password (check [Step 2c](#step2c)):
+
+![The login to a world of wonder.](/img/screenshot_finish_button.png)
+
+Et voilà: Your very own scalable RStudio instance, accessible world-wide and ready to use at all times. In other words: Congratulations, you now have a state-of-the-art Data Science Machine at your command. Use it wisely. If you want to see what kind of wonders you can do with this setup, check out the [upcoming blog post](http://127.0.0.1:4321/2018/01/benchmarking-aws-instances/). Otherwise, let me just point you towards another [wonderful introduction](https://www.kaggle.com/rtatman/getting-started-in-r-first-steps).
 
 
-```{r}
-benchmark_df <- 
-data.frame( instance_class = c("t2", "t2", "t2", "t2", "t2", "c5", "c5", "c5", "x1", "x1", "x1", "p2", "p2", "p2"),
-            instance_name  = c("small", "medium", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge", "large", "xlarge", "2xlarge"), 
-            price_per_hour = c(0.0268, 0.0536, 0.1072, 0.2144, 0.4288, NA, NA, NA, NA, NA, NA, NA, NA, NA),
-stringsAsFactors = FALSE)
-``` 
+## Step 4: Create a personal AMI for future convenience
 
-The performance of these machines is benchmarked in an upcoming blogpost <LINK>, but as an overall recommendation I suggest to start with the t2.micro machine. Its performance is good enough for most use cases, yet it is still in the free tier.
+Now, Step 3 consisted of 4 different steps, and it would be ratehr inconvenient to have to repeat these steps each time you need a new RStudio instance, right? Luckily, AWS has got you covered: You can create an "image" of any AWS instance: simply put, this saves your current configuration for later use. The creation of such an image is straightforward: Just go to "Instances" in your AWS Dashboard, right-click on the machine you want to base the image on and select "Create Image":
 
-After finally launching your instance let’s now check out the `EC2 Instances`, you should see something like this:
+![Locate "Create Image" in the menu of "Instance Settings"](/img/screenshot_finish_button.png)
 
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+After this step, you will find the created image in the menu AMIs, ready to reuse. Before you go do crazy and wonderful Data Science in your wonderful new Environment, though, it is essential that you let me tell you about
 
-The public IP (in the red circle) is the IP under which the instance can be reached with the browser. Opening the IP in the browser brings us to the following login page:
+## The Last Step (After Each AWS Usage): Shutting Down
+An AWS instance doesn’t shut down by itself, or go into hibernation or anything like that. It just keeps running unless otherwise specified, eventually costing lots of money (even the free tier services have their prices after some limit). So, let me show you how to shut down your brand new machine. It’s quite simple, just right-click on the running instance and set the "Instance State" to "Terminate".
 
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+![Show no mercy, terminate!](https://res.cloudinary.com/dlprdrxib/image/upload/v1516310583/screenshot_terminateinstance_el4vj8.png)
 
-And, using our credentials from Step 4a, we finally arrive at the finish line:
+Since our instance also automatically loaded an EBS volume (like a hard disk to save data), we need to shut that down too. Choose the entry EBS volumes in the sidepane and *Detach* all volumes that are active. If your overview in the pane "Dashboard" looks similar to this :
 
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
-
-This is now the front-end to a fully functioning Linux environment with the newest versions of R, Python, Julia etc. so that In other words: Congratulations, you now have a state-of-the-art Data Science Environment at your command. Use it wisely ;) If you want to see what kind of wonders you can do with this setup, check out the upcoming blog post YYYY. If you just want to get to know `R`with simple first steps, check out this wonderful introduction: XXXX.
-
-Before you go, though, let me tell you about
-
-## Last Step (After Each AWS Usage): Shutting Down
-An AWS instance doesn’t shut down by itself, or go into hibernation or anything like that. It just keeps running unless otherwise specified, eventually costing lots of money (even the free tier services have their prices after some limit). So, let me show you how to shut down your brand new machine. It’s quite simple, just right-click on the running instance and choose *terminate*.
-
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
-
-Since our instance also automatically loaded an EBS volume (like a hard disk to save data), we need to shut that down too. Choose the entry EBS volumes in the sidepane and *Detach* all volumes that are active. If your overview in the Dashboard looks similar to this :
-
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](You max press it now. How exciting!)
+!["5 volumes": make sure that they are not in-use, since storage may also cost after some initial period](https://res.cloudinary.com/dlprdrxib/image/upload/v1516310583/screenshot_terminateinstance_el4vj8.png)
 
 There are no hidden services running racking up costs.
 
@@ -140,10 +140,14 @@ There are no hidden services running racking up costs.
 After configuring your AWS environment as decried above, your new ‚Data Science Workflow‘ can look like this:
 
 1. Log in to AWS,
-2. Start Launch Template,
-3. Choose the Appropriate Machine,
+2. Choose your personal RStudio AMI, 
+3. Choose the Necessary Specifications of the Machine,
 4. Log in to the Machine in the Browser,
 5. Do Awesome Data Science,
 6. Shut Down Machine and all Resources.
 
 Have fun, and remember: Primere non nocere!
+
+
+
+[^2]: A rough estimate. Maybe only gazillions.

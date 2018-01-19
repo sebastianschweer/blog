@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Aws on Sebastian Schweer&#39;s Private Blog</title>
+    <title>Aws on Sastibe&#39;s Data Science Blog</title>
     <link>/categories/aws/</link>
-    <description>Recent content in Aws on Sebastian Schweer&#39;s Private Blog</description>
+    <description>Recent content in Aws on Sastibe&#39;s Data Science Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 12 Jan 2018 00:00:00 +0000</lastBuildDate>
@@ -28,7 +28,8 @@ These instances differ in two dimensions: price and performance. Obviously, thes
       <pubDate>Fri, 05 Jan 2018 00:00:00 +0000</pubDate>
       
       <guid>/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/</guid>
-      <description>Setting up an R Environment: Available Anytime, Anywhere? Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?</description>
+      <description>Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?
+Obviously, that is the case.</description>
     </item>
     
   </channel>

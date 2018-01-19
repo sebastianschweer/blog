@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on Sebastian Schweer&#39;s Private Blog</title>
+    <title>Tags on Sastibe&#39;s Data Science Blog</title>
     <link>/tags/</link>
-    <description>Recent content in Tags on Sebastian Schweer&#39;s Private Blog</description>
+    <description>Recent content in Tags on Sastibe&#39;s Data Science Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 09 Jan 2018 00:00:00 +0000</lastBuildDate>
@@ -41,7 +41,7 @@
     <item>
       <title>Getting Started</title>
       <link>/tags/getting-started/</link>
-      <pubDate>Fri, 05 Jan 2018 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 19 Jan 2018 00:00:00 +0000</pubDate>
       
       <guid>/tags/getting-started/</guid>
       <description></description>
@@ -53,6 +53,15 @@
       <pubDate>Fri, 12 Jan 2018 00:00:00 +0000</pubDate>
       
       <guid>/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Programming</title>
+      <link>/tags/programming/</link>
+      <pubDate>Fri, 19 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/programming/</guid>
       <description></description>
     </item>
     

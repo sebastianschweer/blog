@@ -28,15 +28,18 @@
     
 
     
-    <meta name="description" content="Setting up an R Environment: Available Anytime, Anywhere? Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?">
-    <meta property="og:description" content="Setting up an R Environment: Available Anytime, Anywhere? Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?">
+    <meta name="description" content="Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?
+Obviously, that is the case.">
+    <meta property="og:description" content="Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?
+Obviously, that is the case.">
     <meta property="og:type" content="blog">
     <meta property="og:title" content="Setting up a Scalable RStudio Instance in AWS">
     <meta property="og:url" content="/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/">
-    <meta property="og:site_name" content="Sebastian Schweer&#39;s Private Blog">
+    <meta property="og:site_name" content="Sastibe&#39;s Data Science Blog">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Sebastian Schweer&#39;s Private Blog">
-    <meta name="twitter:description" content="Setting up an R Environment: Available Anytime, Anywhere? Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?">
+    <meta name="twitter:title" content="Sastibe&#39;s Data Science Blog">
+    <meta name="twitter:description" content="Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?
+Obviously, that is the case.">
     
       <meta name="twitter:creator" content="@bastischweer">
     
@@ -76,7 +79,7 @@
       <header id="header" data-behavior="4">
   <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
   <div class="header-title">
-    <a class="header-title-link" href="/">Sebastian Schweer&#39;s Private Blog</a>
+    <a class="header-title-link" href="/">Sastibe&#39;s Data Science Blog</a>
   </div>
   
 </header>
@@ -90,7 +93,7 @@
         </a>
         <h4 class="sidebar-profile-name">Sebastian Schweer</h4>
         
-          <h5 class="sidebar-profile-bio">Statistician. Data Scientist. Fiddler.</h5>
+          <h5 class="sidebar-profile-bio">Theoretiker, Ingenieur, Berater, Erzähler.</h5>
         
       </div>
     
@@ -210,20 +213,29 @@
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <div id="setting-up-an-r-environment-available-anytime-anywhere" class="section level1">
-<h1>Setting up an R Environment: Available Anytime, Anywhere?</h1>
-<p>Assume you want to start to write <code>R</code> code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for <code>R</code> coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?</p>
-<p>Indeed it would be! (I love rhethorical questions…) In this post, I will show you the steps for setting up such an environment on Amazon Web Services (AWS). The main advantages of using such a set-up: Runs on any infrastructure: All you need is a working internet connection, a decent browser and an AWS account, which is usually free.*Footnote: For a given value of usually. I personally try to test out lots of resources just because I can, yet even so, my total expenses for AWS result in 0.37€ (January 2018). A related point Runs everywhere: The AWS machine will be set up to automatically clone your GitHub repository (don’t worry if this doesn’t mean anything to you, this point is optional), so that you don’t even have to have your codes on the device. Scalable: The AWS machine running your code can be chosen to suit any of your needs, in any session. Just playing around with a new package? Use the smallest size, doesn’t cost a dime. Trying to re-create Google’s preformance on a fancy DNN-classification? Go all in with 500 GB of RAM; it’ll cost ya, but it’s fun. Up-to-Date: Since the envirionment is freshly installed each time, your <code>R</code> version as well as the package versions in use are automatically up-to-date. In the latter case, that would also be easy to maintain on a local machine, the former, however, is a nice benefit.</p>
+              <p>Assume you want to start to write <code>R</code> code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for <code>R</code> coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?</p>
+<p>Obviously, that is the case. In this post, I will show you the steps for setting up such an environment on Amazon Web Services (AWS). The main advantages of using such a set-up:</p>
+<ul>
+<li>Runs on any infrastructure: All you need is a working internet connection, a decent browser and an AWS account, which is usually<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> free.</li>
+<li>Runs everywhere: The AWS machine will be set up to automatically clone your GitHub repository (don’t worry if this doesn’t mean anything to you, this point is optional), so that you don’t even have to have your codes on the device.</li>
+<li>Scalable: The AWS machine running your code can be chosen to suit any of your needs, in any session. Just playing around with a new package? Use the smallest size, doesn’t cost a dime. Trying to re-create state-of-the-art machine learning performance with a fancy DNN-classifier? Go all in with 500 GB of RAM; it’ll cost ya, but it’s fun.</li>
+<li>Up-to-Date: Since the envirionment is freshly installed each time, your <code>R</code> version as well as the package versions in use are automatically up-to-date. In the latter case, that would also be easy to maintain on a local machine, the former, however, is a nice benefit.</li>
+</ul>
 <p>Convinced? Awesome, let’s get started!</p>
-</div>
 <div id="overview-of-main-steps" class="section level1">
 <h1>Overview of main steps</h1>
 <p>First a short overview of the main steps covered in this blog post:</p>
 <ol style="list-style-type: decimal">
 <li>Get an AWS account (duh!),</li>
+<li>Configure your RStudio AMI,
+<ol style="list-style-type: lower-roman">
 <li>Find the right RStudio AMI,</li>
-<li>Configure the security group for your RStudio instance,</li>
-<li>Create a launch template in AWS, 4a. Incorporate a clone of your GitHub repo,</li>
+<li>Configure Security Groups,</li>
+<li>Automatically Change your RStudio Password,</li>
+<li>Incorporate a clone of your GitHub repo,</li>
+</ol></li>
+<li>Start your First RStudio instance (and bask in its glory),</li>
+<li>Create a personal AMI for future convenience,</li>
 <li>Shut down the Instance and all Resources.</li>
 </ol>
 <p>Preconditions for this tutorial should be basically none, at least in terms of coding and/or understanding <code>R</code> itself. The main task will lie in clicking the right buttons.</p>
@@ -232,63 +244,89 @@
 <p>Well, it isn’t really my place to tell you how to get an AWS account if Amazon itself did <a href="https://aws.amazon.com/resources/create-account/">such a great job explaining it</a>. Just use the link to set up your account, and I further suggest to follow <a href="https://aws.amazon.com/getting-started/tutorials/launch-a-virtual-machine/">this set of instructions</a>, building your very first instance. Take your time going through these instructions, I’ll wait…</p>
 <p>Ready? Alright, sweet. Then we continue with</p>
 </div>
-<div id="step-2-find-the-current-rstudio-ami." class="section level2">
-<h2>Step 2: Find the current RStudio AMI.</h2>
-<p>AMI stands for Amazon Machine Images, which is like an operating system container. More to the point, in an AMI a Linux distribution can be bundled with addtional software packages tailored to any type of need: web development, accounting (I’m guessing here, but … sure) and, most importantly, using RStudio. <a href="http://www.louisaslett.com/RStudio_AMI/">On Louis Anslett’S homepage</a> you can find a wonderful storage of RStudio AMIs. We use the newest version for the correct geographical zone, in my case Frankfurt:</p>
-<p><a href="http://www.louisaslett.com/RStudio_AMI/"><img src="/img/screenshot_louisaslett.png" alt="Screenshot_Louis_Anslett" /></a></p>
-<p>As you can see, thanks to Louis Anslett’s work, the AMI includes not only the newest version of RStudio but also of <code>R itself as well as a handful of helpful additional software packages. For instance, Git comes pre-installed, which we will use later on; also</code>Julia`is installed for those looking to try out the possible future of data science languages. But I’m deviating, let’s get back on track with</p>
-<div id="step-3-configure-the-security-groups-for-your-rstudio-instance" class="section level3">
-<h3>Step 3: Configure the security groups for your RStudio instance</h3>
+<div id="step-2-configure-your-rstudio-ami." class="section level2">
+<h2>Step 2: Configure your RStudio AMI.</h2>
+<p>In this step, I collected several steps, not all of which are necessary. Steps 2a and 2b are crucial, Step 2c is recommended. Step 2d can be skipped on the first set-up. The implementation of this step can always be re-assessed whenever it becomes necessary.</p>
+<p>Let’s begin by starting an instance in the AWS Dashboard. Just open “Instances” on the side menu of your EC2 Dashboard and click on “Launch Instance”:</p>
+<div class="figure">
+<img src="SCREENSHOT_START_INSTANCE" alt="Here we go!" />
+<p class="caption">Here we go!</p>
+</div>
+<div id="step-2a-find-the-current-rstudio-ami." class="section level3">
+<h3>Step 2a: Find the current RStudio AMI.</h3>
+<p>The first task is to choose an Amazon Machine Image, or AMI, which is essentially an operating system container. More to the point, in an AMI a Linux distribution can be bundled with addtional software packages tailored to any type of need: web development, accounting (I’m guessing here, but … sure) and, most importantly, using RStudio. <a href="http://www.louisaslett.com/RStudio_AMI/">On Louis Anslett’s homepage</a> you can find a wonderful storage of RStudio AMIs. We use the newest version for the correct geographical zone, in my case Frankfurt: <img src="https://res.cloudinary.com/dlprdrxib/image/upload/v1516304602/screenshot_louisaslett_eyug44.png" alt="One AMI for each region. Neat" /></p>
+<p>As you can see, thanks to Louis Anslett’s work, the AMI includes not only the newest version of RStudio but also of <code>R</code> itself as well as a handful of helpful additional software packages. For instance, Git comes pre-installed, which we will use later on; also <code>Julia</code>is installed for those looking to try out the possible future of data science languages. But I’m deviating… Let’s note the AMI-ID (in our case “ami-a80db3c7”), put this in the start-up options and let’s continue.</p>
+</div>
+<div id="step-2b-configure-the-security-groups-for-your-rstudio-instance" class="section level3">
+<h3>Step 2b: Configure the security groups for your RStudio instance</h3>
 <p>In AWS, <a href="https://docs.aws.amazon.com/en_en/AWSEC2/latest/UserGuide/using-network-security.html">security groups</a> control the access to the machine over the internet (if you don‘t care about how exactly this works and only want to follow the instructions, just skip the next sentences). More precisely, they define which kind of protocols may use which ports on your machine from a given IP range. For example, you can set the access rights for a ssh protocol to be able to connect to your machine on port 22 only from your personal IP address at home.</p>
 <p>In our case, we actually only need access via http protocol, since the RStudio instance will allow log-in via browser interface. Therefore, our security group can be kept quite simple:</p>
-<p><a href="https://docs.aws.amazon.com/en_en/AWSEC2/latest/UserGuide/using-network-security.html"><img src="/img/screenshot_security_group.png" alt="Screenshot_Security Group" /></a></p>
+<div class="figure">
+<img src="http://res.cloudinary.com/dlprdrxib/image/upload/v1515794260/screenshot_security_group_xy0wkr.png" alt="The bottom option allows the whole world to see the instance. Golly." />
+<p class="caption">The bottom option allows the whole world to see the instance. Golly.</p>
+</div>
 <p>The IP range can be limited to your own personal IP to ensure the safety of your instance. This precaution could be necessary since only the login page of RStudio stands between the internet and your instance (spooky, huh?). However, since the personal IP usually changes each day (roughly speaking), this becomes a personal question of “privacy vs. convenience”. In my case, as you can see, convenience won.</p>
 </div>
+<div id="step2c" class="section level3">
+<h3>2c. Automatically Change your RStudio Password</h3>
+<p>In the documentation of the RStudio AMI we can find the following passage: “It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there”. Alright, fine, but I’d rather to that programmatically, i.e. automatically. The weirdly named “User data” option provides just the framework: All commands placed here get executed at the beginning of the start-up. You can find this setting in the menu “Configure Instance Details” under “Advanced Details”&quot; like so:</p>
+<div class="figure">
+<img src="/img/screenshot_security_group.png" alt="Do the deep dive, yeah!" />
+<p class="caption">Do the deep dive, yeah!</p>
 </div>
-<div id="step-4-create-a-launch-template-in-aws" class="section level2">
-<h2>Step 4: Create a launch template in AWS</h2>
-<p>We now configure a launch template in AWS to simplify the process of starting up our RStudio instance in the future. This step is not entirely necessary, but I highly recommend it due to its simplicity and benefits. Begin by starting the launch template wizard on the AWS Dashboard Side Panel. The only things necessary for the set-up are the AMI of step 2 and the security groups from step 3 (see how neatly this all ties together? Almost as if somebody thought it through…). The only thing left to do is to choose the type of instance to start by default. I recommend to set the lowest ranking instance by default: It is still capable of running basic analyses, yet it doesn‘t cost a thing. Before clicking the finish button:</p>
-<p>[<img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" />]</p>
-<p>there are two small (optional) additions that can be handled with the so-called “User data” in the advanced details Why exactly this is called “user data”, I’m not entirely sure, but as long as it is useful, I don’t really care.</p>
-</div>
-<div id="step-4a-resetting-the-rstudio-password" class="section level2">
-<h2>Step 4a: Resetting the RStudio password</h2>
-<p>In the documentation of the RStudio AMI we can find the following passage: „It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there“. Alright, fine, but it bothers me to have to do that EVERY SINGLE TIME I log on. There‘s a nicer way to do this, and”User data&quot; provides just the framework: All commands placed here get executed at the beginning of the start-up. Thus, we only need to run the following code to change the password for the user RStudio:</p>
+<p>In order to change the password of the user “RStudio” on start-up, we paste the following code:</p>
 <pre class="r"><code>#!/bin/bash
 echo &quot;rstudio:guest&quot; | chpasswd</code></pre>
-<p>where you should replace the password “guest” with whatever you deem appropriate. Unfortunately, AWS “User data” only understands BASE64 encoded commands (please don‘t ask me why), we first need to transform this command into the new encoding. This can be done online right <a href="https://www.base64encode.org/">here</a>. In Ubuntu, there is also a simple alternative command ´base64‘. We are almost done with the set-up now, there only remains</p>
+<p>where you should replace the password “guest” with whatever you deem appropriate. We are almost done with the set-up now, there only remains</p>
 </div>
-<div id="step-4b-optional-automatically-clone-a-github-repo" class="section level2">
-<h2>Step 4b (optional): Automatically Clone a GitHub repo</h2>
+<div id="step-2d-optional-automatically-clone-a-github-repo" class="section level3">
+<h3>Step 2d (optional): Automatically Clone a GitHub repo</h3>
 <p>I write all my private code projects on my GitHub account (here: <a href="https://github.com/sebastianschweer" class="uri">https://github.com/sebastianschweer</a>. What a shameless self-plug!) and I also would like my code to be available for me each time I start up my RStudio instance. Fortunately, this is easily configured with “User data” again, by just adding the command</p>
 <pre class="r"><code>git clone https://github.com/sebastianschweer/sastibe.git /home/rstudio/sastibe
 chmod -R 777 /home/rstudio/sastibe</code></pre>
-<p>and running the encoding steps as in Step 4a. Now, each time I start up a new RStudio instance, the repo <code>sastibe</code> gets cloned into the folder /home/rstudio/sastibe, which is automatically loaded in RStudio. The line with <code>chmod</code> ensures that any user (not just root, who is executing this command at startup) has the rights to alter content in that folder. This permission allows me to change code and pushing my changes to the repo and all that, which is just super convenient.</p>
-<p>Now, we are ready for our first test run. We start our wonderful new machine by hitting the start button:</p>
-<p><a href="You%20max%20press%20it%20now.%20How%20exciting!"><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
-<p>AWS now asks us to choose the size of the machine:</p>
-<p>[<img src="/img/screenshot_xxx" alt="Screenshot_Machine Selection" />], And the number of possibilities seems endless. I have created a list of choice examples to use here:</p>
-<pre class="r"><code>benchmark_df &lt;- 
-data.frame( instance_class = c(&quot;t2&quot;, &quot;t2&quot;, &quot;t2&quot;, &quot;t2&quot;, &quot;t2&quot;, &quot;c5&quot;, &quot;c5&quot;, &quot;c5&quot;, &quot;x1&quot;, &quot;x1&quot;, &quot;x1&quot;, &quot;p2&quot;, &quot;p2&quot;, &quot;p2&quot;),
-            instance_name  = c(&quot;small&quot;, &quot;medium&quot;, &quot;large&quot;, &quot;xlarge&quot;, &quot;2xlarge&quot;, &quot;large&quot;, &quot;xlarge&quot;, &quot;2xlarge&quot;, &quot;large&quot;, &quot;xlarge&quot;, &quot;2xlarge&quot;, &quot;large&quot;, &quot;xlarge&quot;, &quot;2xlarge&quot;), 
-            price_per_hour = c(0.0268, 0.0536, 0.1072, 0.2144, 0.4288, NA, NA, NA, NA, NA, NA, NA, NA, NA),
-stringsAsFactors = FALSE)</code></pre>
-<p>The performance of these machines is benchmarked in an upcoming blogpost <LINK>, but as an overall recommendation I suggest to start with the t2.micro machine. Its performance is good enough for most use cases, yet it is still in the free tier.</p>
-<p>After finally launching your instance let’s now check out the <code>EC2 Instances</code>, you should see something like this:</p>
-<p><a href="You%20max%20press%20it%20now.%20How%20exciting!"><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
-<p>The public IP (in the red circle) is the IP under which the instance can be reached with the browser. Opening the IP in the browser brings us to the following login page:</p>
-<p><a href="You%20max%20press%20it%20now.%20How%20exciting!"><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
-<p>And, using our credentials from Step 4a, we finally arrive at the finish line:</p>
-<p><a href="You%20max%20press%20it%20now.%20How%20exciting!"><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
-<p>This is now the front-end to a fully functioning Linux environment with the newest versions of R, Python, Julia etc. so that In other words: Congratulations, you now have a state-of-the-art Data Science Environment at your command. Use it wisely ;) If you want to see what kind of wonders you can do with this setup, check out the upcoming blog post YYYY. If you just want to get to know <code>R</code>with simple first steps, check out this wonderful introduction: XXXX.</p>
-<p>Before you go, though, let me tell you about</p>
+<p>to the “User data” of <a href="#setp2c">Step 2c</a>. Now, when I start up the new RStudio instance, the repository <code>sastibe</code> gets cloned into the folder <code>/home/rstudio/sastibe</code>, which is automatically loaded in RStudio. The line with <code>chmod</code> ensures that any user (not just root, who is executing this command at startup) has the rights to alter content in that folder. This permission allows me to change code and pushing my changes to the repository and all that, which is just super convenient.</p>
 </div>
-<div id="last-step-after-each-aws-usage-shutting-down" class="section level2">
-<h2>Last Step (After Each AWS Usage): Shutting Down</h2>
-<p>An AWS instance doesn’t shut down by itself, or go into hibernation or anything like that. It just keeps running unless otherwise specified, eventually costing lots of money (even the free tier services have their prices after some limit). So, let me show you how to shut down your brand new machine. It’s quite simple, just right-click on the running instance and choose <em>terminate</em>.</p>
-<p><a href="You%20max%20press%20it%20now.%20How%20exciting!"><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
-<p>Since our instance also automatically loaded an EBS volume (like a hard disk to save data), we need to shut that down too. Choose the entry EBS volumes in the sidepane and <em>Detach</em> all volumes that are active. If your overview in the Dashboard looks similar to this :</p>
-<p><a href="You%20max%20press%20it%20now.%20How%20exciting!"><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
+</div>
+<div id="step-3-start-your-first-rstudio-instance-and-bask-in-its-glory" class="section level2">
+<h2>Step 3: Start your First RStudio instance (and bask in its glory),</h2>
+<p>The last and most exciting click is this one:</p>
+<div class="figure">
+<img src="/img/screenshot_finish_button.png" alt="Hooray, all the hard work pays off!" />
+<p class="caption">Hooray, all the hard work pays off!</p>
+</div>
+<p>We have now started the instance. This means that a virtual machine, configured according to our specifitcations is being run on one of Amazon’s bajillion<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> cloud computing servers. In the menu “Instances” we now see an active instance running. After we are done, we will use this menu to shut it down again (so that it doesn#t cost us), but not now: we are eager to test it out! Accessing the instance is quite easy in our case: Just copy the “IPv4 Public IP” adress and paste it in your browser:</p>
+<div class="figure">
+<img src="/img/screenshot_finish_button.png" alt="Green lights indicate the instance runs harmoniously." />
+<p class="caption">Green lights indicate the instance runs harmoniously.</p>
+</div>
+<p>Hopefully, you haven’t forgotten your password (check <a href="#step2c">Step 2c</a>):</p>
+<div class="figure">
+<img src="/img/screenshot_finish_button.png" alt="The login to a world of wonder." />
+<p class="caption">The login to a world of wonder.</p>
+</div>
+<p>Et voilà: Your very own scalable RStudio instance, accessible world-wide and ready to use at all times. In other words: Congratulations, you now have a state-of-the-art Data Science Machine at your command. Use it wisely. If you want to see what kind of wonders you can do with this setup, check out the <a href="http://127.0.0.1:4321/2018/01/benchmarking-aws-instances/">upcoming blog post</a>. Otherwise, let me just point you towards another <a href="https://www.kaggle.com/rtatman/getting-started-in-r-first-steps">wonderful introduction</a>.</p>
+</div>
+<div id="step-4-create-a-personal-ami-for-future-convenience" class="section level2">
+<h2>Step 4: Create a personal AMI for future convenience</h2>
+<p>Now, Step 3 consisted of 4 different steps, and it would be ratehr inconvenient to have to repeat these steps each time you need a new RStudio instance, right? Luckily, AWS has got you covered: You can create an “image” of any AWS instance: simply put, this saves your current configuration for later use. The creation of such an image is straightforward: Just go to “Instances” in your AWS Dashboard, right-click on the machine you want to base the image on and select “Create Image”:</p>
+<div class="figure">
+<img src="/img/screenshot_finish_button.png" alt="Locate Create Image in the menu of Instance Settings" />
+<p class="caption">Locate “Create Image” in the menu of “Instance Settings”</p>
+</div>
+<p>After this step, you will find the created image in the menu AMIs, ready to reuse. Before you go do crazy and wonderful Data Science in your wonderful new Environment, though, it is essential that you let me tell you about</p>
+</div>
+<div id="the-last-step-after-each-aws-usage-shutting-down" class="section level2">
+<h2>The Last Step (After Each AWS Usage): Shutting Down</h2>
+<p>An AWS instance doesn’t shut down by itself, or go into hibernation or anything like that. It just keeps running unless otherwise specified, eventually costing lots of money (even the free tier services have their prices after some limit). So, let me show you how to shut down your brand new machine. It’s quite simple, just right-click on the running instance and set the “Instance State” to “Terminate”.</p>
+<div class="figure">
+<img src="https://res.cloudinary.com/dlprdrxib/image/upload/v1516310583/screenshot_terminateinstance_el4vj8.png" alt="Show no mercy, terminate!" />
+<p class="caption">Show no mercy, terminate!</p>
+</div>
+<p>Since our instance also automatically loaded an EBS volume (like a hard disk to save data), we need to shut that down too. Choose the entry EBS volumes in the sidepane and <em>Detach</em> all volumes that are active. If your overview in the pane “Dashboard” looks similar to this :</p>
+<div class="figure">
+<img src="https://res.cloudinary.com/dlprdrxib/image/upload/v1516310583/screenshot_terminateinstance_el4vj8.png" alt="5 volumes: make sure that they are not in-use, since storage may also cost after some initial period" />
+<p class="caption">“5 volumes”: make sure that they are not in-use, since storage may also cost after some initial period</p>
+</div>
 <p>There are no hidden services running racking up costs.</p>
 </div>
 </div>
@@ -297,13 +335,20 @@ stringsAsFactors = FALSE)</code></pre>
 <p>After configuring your AWS environment as decried above, your new ‚Data Science Workflow‘ can look like this:</p>
 <ol style="list-style-type: decimal">
 <li>Log in to AWS,</li>
-<li>Start Launch Template,</li>
-<li>Choose the Appropriate Machine,</li>
+<li>Choose your personal RStudio AMI,</li>
+<li>Choose the Necessary Specifications of the Machine,</li>
 <li>Log in to the Machine in the Browser,</li>
 <li>Do Awesome Data Science,</li>
 <li>Shut Down Machine and all Resources.</li>
 </ol>
 <p>Have fun, and remember: Primere non nocere!</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>For a given value of usually. I personally try to test out lots of resources just because I can, yet even so, my total expenses for AWS result in 0.37€ (January 2018).<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>A rough estimate. Maybe only gazillions.<a href="#fnref2">↩</a></p></li>
+</ol>
 </div>
 
               
@@ -482,7 +527,7 @@ stringsAsFactors = FALSE)</code></pre>
     
     <h4 id="about-card-name">Sebastian Schweer</h4>
     
-      <div id="about-card-bio">Statistician. Data Scientist. Fiddler.</div>
+      <div id="about-card-bio">Theoretiker, Ingenieur, Berater, Erzähler.</div>
     
     
       <div id="about-card-job">
@@ -519,6 +564,24 @@ stringsAsFactors = FALSE)</code></pre>
       <div class="no-result text-color-light text-center">no post found</div>
       <div class="results">
         
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2018/01/my-motivations-for-starting-a-blog/">
+                <h3 class="media-heading">My Motivations for Starting a Blog</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jan 1, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Hello world!
+I am a Data Scientist. This field is notoriously difficult to describe, but I like this definition. My job requires me to spend a lot of time each day writing code in varying languages, mostly R but also Python and SAS. This inevitably leads me to spend a lot of time thinking about both code as well as the process of programming itself. Recently, I stumbled upon1 a incredibly concise diagram:</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
         
           <div class="media">
             
@@ -586,7 +649,8 @@ One particularly interesting subset of networks is made up by scientific researc
                   Jan 1, 2018
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather">Setting up an R Environment: Available Anytime, Anywhere? Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?</div>
+              <div class="media-content hide-xs font-merryweather">Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?
+Obviously, that is the case.</div>
             </div>
             <div style="clear:both;"></div>
             <hr>
@@ -599,7 +663,7 @@ One particularly interesting subset of networks is made up by scientific researc
          data-message-zero="no post found"
          data-message-one="1 post found"
          data-message-other="{n} posts found">
-         4 posts found
+         5 posts found
       </p>
     </div>
   </div>
