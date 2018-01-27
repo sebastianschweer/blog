@@ -1,7 +1,7 @@
 ---
 title: Setting up a Scalable RStudio Instance in AWS
 author: Sebastian Schweer
-date: '2018-01-05'
+date: '2018-01-27'
 categories:
   - AWS
   - R
@@ -53,7 +53,7 @@ In this step, I collected several steps, not all of which are necessary. Steps 2
 
 Let's begin by starting an instance in the AWS Dashboard. Just open "Instances" on the side menu of your EC2 Dashboard and click on "Launch Instance":
 
-![Here we go!](SCREENSHOT_START_INSTANCE)
+![Here we go!](https://res.cloudinary.com/dlprdrxib/image/upload/v1517086196/screenshot_launch_instance_ltpbba.png)
 
 
 ### Step 2a: Find the current RStudio AMI.
@@ -77,10 +77,7 @@ The IP range can be limited to your own personal IP to ensure the safety of your
 
 ### 2c. Automatically Change your RStudio Password {#step2c}
 
-In the documentation of the RStudio AMI we can find the following passage: "It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there". Alright, fine, but I'd rather to that programmatically, i.e. automatically. The weirdly named "User data" option provides just the framework: All commands placed here get executed at the beginning of the start-up. You can find this setting in the menu "Configure Instance Details" under "Advanced Details"" like so:
-
-
-![Do the deep dive, yeah!](/img/screenshot_security_group.png)
+In the documentation of the RStudio AMI we can find the following passage: "It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there". Alright, fine, but I'd rather to that programmatically, i.e. automatically. The weirdly named "User data" option provides just the framework: All commands placed here get executed at the beginning of the start-up. You can find this setting in the menu "Configure Instance Details" under "Advanced Details".
 
 In order to change the password of the user "RStudio" on start-up, we paste the following code:
 ```{r eval=FALSE}
@@ -102,15 +99,15 @@ to the "User data" of [Step 2c](#setp2c). Now, when I start up the new RStudio i
 
 The last and most exciting click is this one:
 
-![Hooray, all the hard work pays off!](/img/screenshot_finish_button.png)
+![Hooray, all the hard work pays off!](http://res.cloudinary.com/dlprdrxib/image/upload/v1516310280/screenshot_finish_launch_jdqvec.png)
 
 We have now started the instance. This means that a virtual machine, configured according to our specifitcations is being run on one of Amazon's bajillion[^2] cloud computing servers. In the menu "Instances" we now see an active instance running. After we are done, we will use this menu to shut it down again (so that it doesn#t cost us), but not now: we are eager to test it out! Accessing the instance is quite easy in our case: Just copy the "IPv4 Public IP" adress and paste it in your browser:
 
-![Green lights indicate the instance runs harmoniously.](/img/screenshot_finish_button.png)
+![Green lights indicate the instance runs harmoniously.](https://res.cloudinary.com/dlprdrxib/image/upload/v1517085751/screenshot_publicip_sjmc6c.png)
 
-Hopefully, you haven't forgotten your password (check [Step 2c](#step2c)):
+Hopefully, you haven't forgotten your password (check [Step 2c](#step2c) if you did), your username is "rstudio". After succesful login, you'll be greeted by this screen:
 
-![The login to a world of wonder.](/img/screenshot_finish_button.png)
+![The login to a world of wonder.](https://res.cloudinary.com/dlprdrxib/image/upload/v1517085281/screenshot_rstudio_running_ss7eqo.png)
 
 Et voilà: Your very own scalable RStudio instance, accessible world-wide and ready to use at all times. In other words: Congratulations, you now have a state-of-the-art Data Science Machine at your command. Use it wisely. If you want to see what kind of wonders you can do with this setup, check out the [upcoming blog post](http://127.0.0.1:4321/2018/01/benchmarking-aws-instances/). Otherwise, let me just point you towards another [wonderful introduction](https://www.kaggle.com/rtatman/getting-started-in-r-first-steps).
 
@@ -119,7 +116,7 @@ Et voilà: Your very own scalable RStudio instance, accessible world-wide and re
 
 Now, Step 3 consisted of 4 different steps, and it would be ratehr inconvenient to have to repeat these steps each time you need a new RStudio instance, right? Luckily, AWS has got you covered: You can create an "image" of any AWS instance: simply put, this saves your current configuration for later use. The creation of such an image is straightforward: Just go to "Instances" in your AWS Dashboard, right-click on the machine you want to base the image on and select "Create Image":
 
-![Locate "Create Image" in the menu of "Instance Settings"](/img/screenshot_finish_button.png)
+![Locate "Create Image" in the menu of "Instance Settings"](https://res.cloudinary.com/dlprdrxib/image/upload/v1517086580/screenshot_createAMI_vx0esq.png)
 
 After this step, you will find the created image in the menu AMIs, ready to reuse. Before you go do crazy and wonderful Data Science in your wonderful new Environment, though, it is essential that you let me tell you about
 
@@ -130,7 +127,7 @@ An AWS instance doesn’t shut down by itself, or go into hibernation or anythin
 
 Since our instance also automatically loaded an EBS volume (like a hard disk to save data), we need to shut that down too. Choose the entry EBS volumes in the sidepane and *Detach* all volumes that are active. If your overview in the pane "Dashboard" looks similar to this :
 
-!["5 volumes": make sure that they are not in-use, since storage may also cost after some initial period](https://res.cloudinary.com/dlprdrxib/image/upload/v1516310583/screenshot_terminateinstance_el4vj8.png)
+!["5 volumes": make sure that they are not in-use, since storage may also cost after some initial period](http://res.cloudinary.com/dlprdrxib/image/upload/v1516310279/screenshot_clean_dashboard_cqhspn.png)
 
 There are no hidden services running racking up costs.
 

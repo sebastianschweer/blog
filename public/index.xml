@@ -6,7 +6,7 @@
     <description>Recent content on Sastibe&#39;s Data Science Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 19 Jan 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 28 Jan 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,11 +14,21 @@
     <item>
       <title>My Motivations for Starting a Blog</title>
       <link>/2018/01/my-motivations-for-starting-a-blog/</link>
-      <pubDate>Fri, 19 Jan 2018 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 28 Jan 2018 00:00:00 +0000</pubDate>
       
       <guid>/2018/01/my-motivations-for-starting-a-blog/</guid>
       <description>Hello world!
 I am a Data Scientist. This field is notoriously difficult to describe, but I like this definition. My job requires me to spend a lot of time each day writing code in varying languages, mostly R but also Python and SAS. This inevitably leads me to spend a lot of time thinking about both code as well as the process of programming itself. Recently, I stumbled upon1 a incredibly concise diagram:</description>
+    </item>
+    
+    <item>
+      <title>Setting up a Scalable RStudio Instance in AWS</title>
+      <link>/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/</link>
+      <pubDate>Sat, 27 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/</guid>
+      <description>Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?
+Obviously, that is the case.</description>
     </item>
     
     <item>
@@ -50,16 +60,6 @@ These instances differ in two dimensions: price and performance. Obviously, thes
       <description>“I am very glad you asked me that, Mrs. Rawlinson. The term ‘holistic’ refers to my conviction that what we are concerned here is the fundamental interconnectedness of things.” Douglas Adams, “Dirk Gently’s Holistic Agency”
  Networks are everywhere. The internet, road infrastructure and even the cast list of a theater show: depending on the interpretation, all kinds of entities can be viewed as networks.
 One particularly interesting subset of networks is made up by scientific research papers.</description>
-    </item>
-    
-    <item>
-      <title>Setting up a Scalable RStudio Instance in AWS</title>
-      <link>/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/</link>
-      <pubDate>Fri, 05 Jan 2018 00:00:00 +0000</pubDate>
-      
-      <guid>/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/</guid>
-      <description>Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?
-Obviously, that is the case.</description>
     </item>
     
   </channel>

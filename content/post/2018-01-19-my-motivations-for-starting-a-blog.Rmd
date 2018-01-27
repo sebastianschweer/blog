@@ -1,7 +1,7 @@
 ---
 title: My Motivations for Starting a Blog
 author: Sebastian Schweer
-date: '2018-01-19'
+date: '2018-01-28'
 tags:
   - Getting Started
   - Programming
@@ -10,9 +10,9 @@ slug: my-motivations-for-starting-a-blog
 
 Hello world!
 
-I am a Data Scientist. This field is notoriously difficult to describe, but I like [this definition](link to Hadley's twitter). My job requires me to spend a lot of time each day writing code in varying languages, mostly `R` but also Python and SAS. This inevitably leads me to spend a lot of time thinking about both code as well as the process of programming itself. Recently, I stumbled upon[^1] a incredibly concise diagram:
+I am a Data Scientist. This field is notoriously difficult to describe, but I like [this definition](https://twitter.com/hadleywickham/status/914140589565841410). My job requires me to spend a lot of time each day writing code in varying languages, mostly `R` but also Python and SAS. This inevitably leads me to spend a lot of time thinking about both code as well as the process of programming itself. Recently, I stumbled upon[^1] a incredibly concise diagram:
 
-![Here we go!](SCREENSHOT_START_INSTANCE)
+  ![The importance of collabration](https://res.cloudinary.com/dlprdrxib/image/upload/a_270/v1517091390/skizzeblog_nsrt9u.jpg)
 
 This guiding principle I have since internalized, and I find its reflections in many daily situations. More precisely, I identified these 3 consequences of writing code with the intent of publicizing:
 
@@ -23,9 +23,10 @@ This guiding principle I have since internalized, and I find its reflections in 
 All of these characteristics increase the maturity and quality of the code. Since I am obviously interested in producing high quality work, I started this blog in order to have a public outlet for all my private little programming projects.
 
 The scope of these projects will vary wildly, I am sure, since the inspiration are heterogeneous. For instance, the first three posts have three different "sponsors":
-- I wrote [Setting up an RStudio instance on AWS]() with the audience of my father in mind, since he showed such an interest in my explanations of the topic over the Christmas break,
+
+- I wrote [Setting up an RStudio instance on AWS](/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/) with the audience of my father in mind, since he showed such an interest in my explanations of the topic over the Christmas break,
 - I wrote (or rather 'will write') the post [A benchmark for dplyr vs. dbplyr]() for my sister-in-law, since she asked me about the topic and I didn't know anything abaout it at the time,
-- and for the present article, or rather statement, I had CH in mind, for whom I used to work and who is a great fan of simple but concise diagrams depicting deep thoughts.
+- and for the present article, or rather statement, I had [my former employer](https://twitter.com/christofhorn) in mind, a great fan of simple but concise diagrams depicting deep thoughts.
 
 I appreciate any remarks or comments on anything that I write, and I wish you lots of entertainment perusing my site.  
 

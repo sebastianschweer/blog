@@ -190,9 +190,9 @@ Obviously, that is the case.">
   
   <div class="postShorten-meta post-meta">
     
-      <time itemprop="datePublished" datetime="2018-01-05T00:00:00Z">
+      <time itemprop="datePublished" datetime="2018-01-27T00:00:00Z">
         
-  January 5, 2018
+  January 27, 2018
 
       </time>
     
@@ -249,7 +249,7 @@ Obviously, that is the case.">
 <p>In this step, I collected several steps, not all of which are necessary. Steps 2a and 2b are crucial, Step 2c is recommended. Step 2d can be skipped on the first set-up. The implementation of this step can always be re-assessed whenever it becomes necessary.</p>
 <p>Let’s begin by starting an instance in the AWS Dashboard. Just open “Instances” on the side menu of your EC2 Dashboard and click on “Launch Instance”:</p>
 <div class="figure">
-<img src="SCREENSHOT_START_INSTANCE" alt="Here we go!" />
+<img src="https://res.cloudinary.com/dlprdrxib/image/upload/v1517086196/screenshot_launch_instance_ltpbba.png" alt="Here we go!" />
 <p class="caption">Here we go!</p>
 </div>
 <div id="step-2a-find-the-current-rstudio-ami." class="section level3">
@@ -269,11 +269,7 @@ Obviously, that is the case.">
 </div>
 <div id="step2c" class="section level3">
 <h3>2c. Automatically Change your RStudio Password</h3>
-<p>In the documentation of the RStudio AMI we can find the following passage: “It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there”. Alright, fine, but I’d rather to that programmatically, i.e. automatically. The weirdly named “User data” option provides just the framework: All commands placed here get executed at the beginning of the start-up. You can find this setting in the menu “Configure Instance Details” under “Advanced Details”&quot; like so:</p>
-<div class="figure">
-<img src="/img/screenshot_security_group.png" alt="Do the deep dive, yeah!" />
-<p class="caption">Do the deep dive, yeah!</p>
-</div>
+<p>In the documentation of the RStudio AMI we can find the following passage: “It is highly recommended you change the password immediately and an easy means of doing this is explained upon login in the script that is loaded there”. Alright, fine, but I’d rather to that programmatically, i.e. automatically. The weirdly named “User data” option provides just the framework: All commands placed here get executed at the beginning of the start-up. You can find this setting in the menu “Configure Instance Details” under “Advanced Details”.</p>
 <p>In order to change the password of the user “RStudio” on start-up, we paste the following code:</p>
 <pre class="r"><code>#!/bin/bash
 echo &quot;rstudio:guest&quot; | chpasswd</code></pre>
@@ -291,17 +287,17 @@ chmod -R 777 /home/rstudio/sastibe</code></pre>
 <h2>Step 3: Start your First RStudio instance (and bask in its glory),</h2>
 <p>The last and most exciting click is this one:</p>
 <div class="figure">
-<img src="/img/screenshot_finish_button.png" alt="Hooray, all the hard work pays off!" />
+<img src="http://res.cloudinary.com/dlprdrxib/image/upload/v1516310280/screenshot_finish_launch_jdqvec.png" alt="Hooray, all the hard work pays off!" />
 <p class="caption">Hooray, all the hard work pays off!</p>
 </div>
 <p>We have now started the instance. This means that a virtual machine, configured according to our specifitcations is being run on one of Amazon’s bajillion<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> cloud computing servers. In the menu “Instances” we now see an active instance running. After we are done, we will use this menu to shut it down again (so that it doesn#t cost us), but not now: we are eager to test it out! Accessing the instance is quite easy in our case: Just copy the “IPv4 Public IP” adress and paste it in your browser:</p>
 <div class="figure">
-<img src="/img/screenshot_finish_button.png" alt="Green lights indicate the instance runs harmoniously." />
+<img src="https://res.cloudinary.com/dlprdrxib/image/upload/v1517085751/screenshot_publicip_sjmc6c.png" alt="Green lights indicate the instance runs harmoniously." />
 <p class="caption">Green lights indicate the instance runs harmoniously.</p>
 </div>
-<p>Hopefully, you haven’t forgotten your password (check <a href="#step2c">Step 2c</a>):</p>
+<p>Hopefully, you haven’t forgotten your password (check <a href="#step2c">Step 2c</a> if you did), your username is “rstudio”. After succesful login, you’ll be greeted by this screen:</p>
 <div class="figure">
-<img src="/img/screenshot_finish_button.png" alt="The login to a world of wonder." />
+<img src="https://res.cloudinary.com/dlprdrxib/image/upload/v1517085281/screenshot_rstudio_running_ss7eqo.png" alt="The login to a world of wonder." />
 <p class="caption">The login to a world of wonder.</p>
 </div>
 <p>Et voilà: Your very own scalable RStudio instance, accessible world-wide and ready to use at all times. In other words: Congratulations, you now have a state-of-the-art Data Science Machine at your command. Use it wisely. If you want to see what kind of wonders you can do with this setup, check out the <a href="http://127.0.0.1:4321/2018/01/benchmarking-aws-instances/">upcoming blog post</a>. Otherwise, let me just point you towards another <a href="https://www.kaggle.com/rtatman/getting-started-in-r-first-steps">wonderful introduction</a>.</p>
@@ -310,7 +306,7 @@ chmod -R 777 /home/rstudio/sastibe</code></pre>
 <h2>Step 4: Create a personal AMI for future convenience</h2>
 <p>Now, Step 3 consisted of 4 different steps, and it would be ratehr inconvenient to have to repeat these steps each time you need a new RStudio instance, right? Luckily, AWS has got you covered: You can create an “image” of any AWS instance: simply put, this saves your current configuration for later use. The creation of such an image is straightforward: Just go to “Instances” in your AWS Dashboard, right-click on the machine you want to base the image on and select “Create Image”:</p>
 <div class="figure">
-<img src="/img/screenshot_finish_button.png" alt="Locate Create Image in the menu of Instance Settings" />
+<img src="https://res.cloudinary.com/dlprdrxib/image/upload/v1517086580/screenshot_createAMI_vx0esq.png" alt="Locate Create Image in the menu of Instance Settings" />
 <p class="caption">Locate “Create Image” in the menu of “Instance Settings”</p>
 </div>
 <p>After this step, you will find the created image in the menu AMIs, ready to reuse. Before you go do crazy and wonderful Data Science in your wonderful new Environment, though, it is essential that you let me tell you about</p>
@@ -324,7 +320,7 @@ chmod -R 777 /home/rstudio/sastibe</code></pre>
 </div>
 <p>Since our instance also automatically loaded an EBS volume (like a hard disk to save data), we need to shut that down too. Choose the entry EBS volumes in the sidepane and <em>Detach</em> all volumes that are active. If your overview in the pane “Dashboard” looks similar to this :</p>
 <div class="figure">
-<img src="https://res.cloudinary.com/dlprdrxib/image/upload/v1516310583/screenshot_terminateinstance_el4vj8.png" alt="5 volumes: make sure that they are not in-use, since storage may also cost after some initial period" />
+<img src="http://res.cloudinary.com/dlprdrxib/image/upload/v1516310279/screenshot_clean_dashboard_cqhspn.png" alt="5 volumes: make sure that they are not in-use, since storage may also cost after some initial period" />
 <p class="caption">“5 volumes”: make sure that they are not in-use, since storage may also cost after some initial period</p>
 </div>
 <p>There are no hidden services running racking up costs.</p>
@@ -377,7 +373,7 @@ chmod -R 777 /home/rstudio/sastibe</code></pre>
           
             <li class="post-action">
               
-                <a class="post-action-btn btn btn--default tooltip--top" href="/2018/01/visualizing-a-web-of-citations/" data-tooltip="Visualizing a Web of Citations Using the Google Scholar API and D3.js">
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2018/01/my-motivations-for-starting-a-blog/" data-tooltip="My Motivations for Starting a Blog">
               
                   <i class="fa fa-angle-left"></i>
                   <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -385,7 +381,7 @@ chmod -R 777 /home/rstudio/sastibe</code></pre>
             </li>
             <li class="post-action">
               
-                <a class="post-action-btn btn btn--disabled">
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2018/01/benchmarking-aws-instances/" data-tooltip="Benchmarking AWS Instances with a Keras Script in R">
               
                   <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
                   <i class="fa fa-angle-right"></i>
@@ -451,7 +447,7 @@ chmod -R 777 /home/rstudio/sastibe</code></pre>
           
             <li class="post-action">
               
-                <a class="post-action-btn btn btn--default tooltip--top" href="/2018/01/visualizing-a-web-of-citations/" data-tooltip="Visualizing a Web of Citations Using the Google Scholar API and D3.js">
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2018/01/my-motivations-for-starting-a-blog/" data-tooltip="My Motivations for Starting a Blog">
               
                   <i class="fa fa-angle-left"></i>
                   <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -459,7 +455,7 @@ chmod -R 777 /home/rstudio/sastibe</code></pre>
             </li>
             <li class="post-action">
               
-                <a class="post-action-btn btn btn--disabled">
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2018/01/benchmarking-aws-instances/" data-tooltip="Benchmarking AWS Instances with a Keras Script in R">
               
                   <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
                   <i class="fa fa-angle-right"></i>
@@ -586,6 +582,24 @@ I am a Data Scientist. This field is notoriously difficult to describe, but I li
           <div class="media">
             
             <div class="media-body">
+              <a class="link-unstyled" href="/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/">
+                <h3 class="media-heading">Setting up a Scalable RStudio Instance in AWS</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jan 1, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?
+Obviously, that is the case.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
               <a class="link-unstyled" href="/2018/01/benchmarking-aws-instances/">
                 <h3 class="media-heading">Benchmarking AWS Instances with a Keras Script in R</h3>
               </a>
@@ -633,24 +647,6 @@ These instances differ in two dimensions: price and performance. Obviously, thes
               <div class="media-content hide-xs font-merryweather">“I am very glad you asked me that, Mrs. Rawlinson. The term ‘holistic’ refers to my conviction that what we are concerned here is the fundamental interconnectedness of things.” Douglas Adams, “Dirk Gently’s Holistic Agency”
  Networks are everywhere. The internet, road infrastructure and even the cast list of a theater show: depending on the interpretation, all kinds of entities can be viewed as networks.
 One particularly interesting subset of networks is made up by scientific research papers.</div>
-            </div>
-            <div style="clear:both;"></div>
-            <hr>
-          </div>
-        
-          <div class="media">
-            
-            <div class="media-body">
-              <a class="link-unstyled" href="/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/">
-                <h3 class="media-heading">Setting up a Scalable RStudio Instance in AWS</h3>
-              </a>
-              <span class="media-meta">
-                <span class="media-date text-small">
-                  Jan 1, 2018
-                </span>
-              </span>
-              <div class="media-content hide-xs font-merryweather">Assume you want to start to write R code (a very good decision, in my opinion) and you want to be able to write and test code whereever you are. Wouldn’t it be awesome if one could set up an environment that can be used for R coding independent of any device? Where all you need is a decent browser, a working internet connection and you’re good to go?
-Obviously, that is the case.</div>
             </div>
             <div style="clear:both;"></div>
             <hr>
