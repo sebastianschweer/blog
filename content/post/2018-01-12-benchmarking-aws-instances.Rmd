@@ -50,7 +50,7 @@ I started with the candidate `t2.small`. Unfortunately, after the installation t
 
 The error essentially says "Not enough RAM on the machine". I decided not to alter the script for the test in order to accommodate for smaller RAM sizes (I could have limited the number of used words in the model, for instance) since this test is aimed at situations where scalability is important. A "not possible" result is still a useful result for choosing the right infrastructure.
 
-A similar thing happened in t2.medium, here the RAM was depleted by the time the validation vectors were defined. In the  Anyways, let’s proceed with the results, first in plain numbers:
+A similar thing happened in t2.medium, here the RAM was depleted by the time the validation vectors were defined. Anyways, let’s proceed with the results, first in plain numbers:
 
 ```{r echo=FALSE}
 benchmark_df <- 
