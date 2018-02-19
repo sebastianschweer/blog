@@ -14,41 +14,30 @@ tags:
 ---
 
 
-In the post XXXX I have shown you how to setup an AWS instance running the newest RStudio, R, python, Julia and so forth, where the choice of performance of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:
+In the post XXXX I have shown you how to setup an AWS instance running the newest RStudio, R, Python, Julia and so forth, where the configuration of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:
 
 [![Screenshot_Finish Button](/img/screenshot_finish_button.png)](...why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!)
 
-These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. 
-
-Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!
+These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!
 
 ## The Test
-For this benchmark test I chose the following task for each of the instances to complete: Using the `keras`Library of YYY, classify the sentiment in 100000 imdb recessions into positive and negative and display the results. The code for the benchmark test can be downloaded here UZZZ was taken entirely from this wonderful blog post: ZZZ For those interested, the script trains a 3-layer (16,64,16) feed-forward Neural Network on the vectorized text data, and additionally calculates the metrics on a validation data set for each epoch. 
+For this benchmark test I chose a classical machine learning task: the classification of the [MNIST](LINK) dataset of handwritten digits, to be categorized as 0-9. This data set has been used to gauge the accuracy of machine learning algorithms since 
 
-I Supplied the original code with a little addition: The last lines read
+For this benchmark test, I borrowed a nice skript by XXX written here, which trains a Support Vector Machine (SVM) on the problem, using only the first 1000 observations of the dataset, each with 768 attributes. I altered the code ever so slightly to that each run of the script returns the following measurements:
 
-So that each run of the script returns N measurements:
-1. Time: The time elapsed since starting the script (excluding the time to install the libraries and download of the data),
+1. Elapsed Time: The time elapsed since starting the script (excluding the time to install the libraries and download of the data),
 2. Accuracy of model,
-3. Loss of model.
 
 ## The Candidates
 
 AWS provides a large number of different configurations, and I will not discuss all of these in this post. Rather, let me focus on four different specifications of computing resource demands and chose a distinctive representative:
 - General: t2
-- Compute Optimization: c5
-- Memory Optimized: x1
-- Accelerated Computing: p2
 
 For each of these classes, I had planned to test the sizes small, medium, large, xlarge and 2xlarge. The sizes micro, small and medium are actually only available for t2 (oh, no!), so that I ended up only testing 14 configurations. 
 
 ## The results
 
-I started with the candidate `t2.small`. Unfortunately, after the installation the script ran into the following error
-
-[![Screenshot_Finish Button](/img/screenshot_finish_button.png)](Huh.)
-
-The error essentially says "Not enough RAM on the machine". I decided not to alter the script for the test in order to accommodate for smaller RAM sizes (I could have limited the number of used words in the model, for instance) since this test is aimed at situations where scalability is important. A "not possible" result is still a useful result for choosing the right infrastructure.
+I started with the candidate `t2.micro`, which is free of charge. Unfortunately, the script never succesfully ran the training of the model, presumably because the dimension of merely 1 GB of RAM is not sufficient. Still, a "not possible" result is still a useful result for choosing the right infrastructure.
 
 A similar thing happened in t2.medium, here the RAM was depleted by the time the validation vectors were defined. Anyways, let’s proceed with the results, first in plain numbers:
 
@@ -66,3 +55,57 @@ stringsAsFactors = FALSE)
 ```{r}
 print(benchmark_df)
 ```
+
+
+t2.medium:
+Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1   2   3   4   5   6   7   8   9
+         0  90   0   0   0   0   0   0   1   0   1
+         1   0 114   3   3   0   0   0   0   2   0
+         2   0   0  91   1   2   1   0   0   0   0
+         3   0   1   3  77   0   6   0   0   1   2
+         4   0   0   1   0 104   0   1   7   1   4
+         5   1   0   2   7   0  78   2   0   1   3
+         6   2   0   1   0   1   0 104   0   0   0
+         7   0   0   3   1   0   0   0  93   0   5
+         8   1   1   1   1   0   0   0   0  77   0
+         9   0   0   0   2   2   1   0   1   1  91
+
+Overall Statistics
+                                          
+               Accuracy : 0.919           
+                 95% CI : (0.9003, 0.9352)
+    No Information Rate : 0.116           
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.9099          
+ Mcnemar's Test P-Value : NA              
+
+Statistics by Class:
+
+                     Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5
+Sensitivity            0.9574   0.9828   0.8667   0.8370   0.9541   0.9070
+Specificity            0.9978   0.9910   0.9955   0.9857   0.9843   0.9825
+Pos Pred Value         0.9783   0.9344   0.9579   0.8556   0.8814   0.8298
+Neg Pred Value         0.9956   0.9977   0.9845   0.9835   0.9943   0.9912
+Prevalence             0.0940   0.1160   0.1050   0.0920   0.1090   0.0860
+Detection Rate         0.0900   0.1140   0.0910   0.0770   0.1040   0.0780
+Detection Prevalence   0.0920   0.1220   0.0950   0.0900   0.1180   0.0940
+Balanced Accuracy      0.9776   0.9869   0.9311   0.9113   0.9692   0.9447
+                     Class: 6 Class: 7 Class: 8 Class: 9
+Sensitivity            0.9720   0.9118   0.9277   0.8585
+Specificity            0.9955   0.9900   0.9956   0.9922
+Pos Pred Value         0.9630   0.9118   0.9506   0.9286
+Neg Pred Value         0.9966   0.9900   0.9935   0.9834
+Prevalence             0.1070   0.1020   0.0830   0.1060
+Detection Rate         0.1040   0.0930   0.0770   0.0910
+Detection Prevalence   0.1080   0.1020   0.0810   0.0980
+Balanced Accuracy      0.9837   0.9509   0.9617   0.9253
+> duration <- Sys.time() - start
+> duration
+Time difference of 1.066024 mins
+
+
+t2.large

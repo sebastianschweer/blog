@@ -10,17 +10,29 @@ tags:
   - Benchmarking
   - Databases
 ---
+# Best Practices for Accessing Data from R?
 
 In a data science project, there are usually three parts of the process one has to cover: Data to Decision to Delivery. The first part, Data, has to answer the question "How do I make the data available for the Data Scientist?". Quite often, the answer to this question involves some form of "Just access the Database XY from your wonderful, fantastic R Data Science machine[^1], and you're done". On a higher level of understanding, that answer is indeed satisfactory. However, as with almost all situations, the detailed execution of the task *access data from a database in R* has several possible manifestations:
 
-- The direct connection to the database is handled by Open DataBase Connecstions (ODBC), for which R provides two major packages `odbc` and `RODBC`,
+- The direct connection to the database is handled by Open DataBase Connections (ODBC), for which R provides two major packages `odbc` and `RODBC`,
 - SQL queries can be executed by both the database and the R machine, depending on how the query is sent.
 
 In this post I present a benchmark test that attempts to test all possible permutations of situations described above. In detail:
 
--{Benchmark Preconditions} I am running the benchmark on an (LINK!!!) RStudio instance with the size t2.micro (4GB of RAM), and a SQL Server database on a different instance (1GB RAM).
+-{Benchmark Preconditions} I am running the benchmark on an RStudio instance on Amazon Web Services with the size t2.micro (4GB of RAM), and a SQL Server database on a different AWS instance (1GB RAM).
 -{Benchmark Test} I'll use the following dataset: XXX. The test query will be of the following form
 -{Comparison Metric} "Time elapsed" until a certain query is finished and the resultant data.frame is available for R to continue working.
  
+
+# Setting Up The Benchmark Test
+
+The first step is setting up an AWS RStudio instance, which is super easy, since I can just follow [this wonderful description]. The SQL Server can be obtained by following [these instructions](). Let's check if everything works as desired:
+
+```{r}
+library(odbc)
+sqlHandle <- odbc::
+```
+
+# The Results
 
 [^1] They may be a bit less enthusiastic about your machine. It depends. 
