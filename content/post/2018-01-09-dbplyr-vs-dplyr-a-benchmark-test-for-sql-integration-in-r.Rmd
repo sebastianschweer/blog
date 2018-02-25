@@ -29,8 +29,8 @@ In this post I present a benchmark test that attempts to test all possible permu
 The first step is setting up an AWS RStudio instance, which is super easy, since I can just follow [this wonderful description]. The SQL Server can be obtained by following [these instructions](). Let's check if everything works as desired:
 
 ```{r}
-library(odbc)
-sqlHandle <- odbc::
+#library(odbc)
+sqlHandle <- "a"
 ```
 
 # The Results

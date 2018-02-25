@@ -1,12 +1,12 @@
 ---
-title: Benchmarking AWS Instances with a Keras Script in R
+title: Benchmarking AWS Instances with MNIST classification in R
 author: Sebastian Schweer
 date: '2018-01-12'
 slug: benchmarking-aws-instances
 categories:
   - AWS
   - R
-  - Keras
+  - caret
 tags:
   - Benchmarking
   - RStudio AMI
@@ -15,56 +15,135 @@ tags:
 
 
 
-<p>In the post XXXX I have shown you how to setup an AWS instance running the newest RStudio, R, python, Julia and so forth, where the choice of performance of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:</p>
-<p><a href="...why%20is%20it%20‚nano‘,%20‚micro‘%20but%20then%20‚large‘%20‚extra%20large‘?%20Be%20consistent,%20dangit!"><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
-<p>These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance.</p>
-<p>Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!</p>
+<p>In <a href="/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/">a previous post</a>I have shown you how to setup an AWS instance running the newest RStudio, R, Python, Julia and so forth, where the configuration of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:</p>
+<div class="figure">
+<img src="/img/screenshot_finish_button.png" alt="…why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!" />
+<p class="caption">…why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!</p>
+</div>
+<p>These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!</p>
 <div id="the-test" class="section level2">
 <h2>The Test</h2>
-<p>For this benchmark test I chose the following task for each of the instances to complete: Using the <code>keras</code>Library of YYY, classify the sentiment in 100000 imdb recessions into positive and negative and display the results. The code for the benchmark test can be downloaded here UZZZ was taken entirely from this wonderful blog post: ZZZ For those interested, the script trains a 3-layer (16,64,16) feed-forward Neural Network on the vectorized text data, and additionally calculates the metrics on a validation data set for each epoch.</p>
-<p>I Supplied the original code with a little addition: The last lines read</p>
-<p>So that each run of the script returns N measurements: 1. Time: The time elapsed since starting the script (excluding the time to install the libraries and download of the data), 2. Accuracy of model, 3. Loss of model.</p>
+<p>For this benchmark test I chose a classical machine learning task: the classification of the <a href="LINK">MNIST</a> dataset of handwritten digits, to be categorized as 0-9. This data set has been used to gauge the accuracy of machine learning algorithms since</p>
+<p>For this benchmark test, I borrowed a nice skript by XXX written here, which trains a Support Vector Machine (SVM) on the problem, using only the first 1000 observations of the dataset, each with 768 attributes. I altered the code ever so slightly to that each run of the script returns the following measurements:</p>
+<ol style="list-style-type: decimal">
+<li>Elapsed Time: The time elapsed since starting the script (excluding the time to install the libraries and download of the data),</li>
+<li>Accuracy of model, i.e. the percentage of predictions that classified the digits correctly.</li>
+</ol>
+<p>Additionally, I included the following information:</p>
+<ol start="3" style="list-style-type: decimal">
+<li>RAM in Gigabytes,</li>
+<li>Number of CPUs in use, and finally</li>
+<li>Price in Dollars per Hour.</li>
+</ol>
 </div>
 <div id="the-candidates" class="section level2">
 <h2>The Candidates</h2>
-<p>AWS provides a large number of different configurations, and I will not discuss all of these in this post. Rather, let me focus on four different specifications of computing resource demands and chose a distinctive representative: - General: t2 - Compute Optimization: c5 - Memory Optimized: x1 - Accelerated Computing: p2</p>
+<p>AWS provides a large number of different configurations, and I will not discuss all of these in this post. Rather, let me focus on four different specifications of computing resource demands and chose a distinctive representative: - General: t2 - Something: m2</p>
 <p>For each of these classes, I had planned to test the sizes small, medium, large, xlarge and 2xlarge. The sizes micro, small and medium are actually only available for t2 (oh, no!), so that I ended up only testing 14 configurations.</p>
 </div>
 <div id="the-results" class="section level2">
 <h2>The results</h2>
-<p>I started with the candidate <code>t2.small</code>. Unfortunately, after the installation the script ran into the following error</p>
-<p><a href="Huh."><img src="/img/screenshot_finish_button.png" alt="Screenshot_Finish Button" /></a></p>
-<p>The error essentially says “Not enough RAM on the machine”. I decided not to alter the script for the test in order to accommodate for smaller RAM sizes (I could have limited the number of used words in the model, for instance) since this test is aimed at situations where scalability is important. A “not possible” result is still a useful result for choosing the right infrastructure.</p>
-<p>A similar thing happened in t2.medium, here the RAM was depleted by the time the validation vectors were defined. In the Anyways, let’s proceed with the results, first in plain numbers:</p>
-<pre class="r"><code>print(benchmark_df)</code></pre>
-<pre><code>##    instance_class instance_name price_per_hour duration_bm loss_bm
-## 1              t2         small         0.0268          NA      NA
-## 2              t2        medium         0.0536          NA      NA
-## 3              t2         large         0.1072   0.0470700      NA
-## 4              t2        xlarge         0.2144   0.0118866  0.5165
-## 5              t2       2xlarge         0.4288   0.0114697  0.5150
-## 6              c5         large             NA          NA      NA
-## 7              c5        xlarge             NA          NA      NA
-## 8              c5       2xlarge             NA          NA      NA
-## 9              x1         large             NA          NA      NA
-## 10             x1        xlarge             NA          NA      NA
-## 11             x1       2xlarge             NA          NA      NA
-## 12             p2         large             NA          NA      NA
-## 13             p2        xlarge             NA          NA      NA
-## 14             p2       2xlarge             NA          NA      NA
-##    accuracy_bm
-## 1           NA
-## 2           NA
-## 3           NA
-## 4       0.8567
-## 5       0.8572
-## 6           NA
-## 7           NA
-## 8           NA
-## 9           NA
-## 10          NA
-## 11          NA
-## 12          NA
-## 13          NA
-## 14          NA</code></pre>
+<p>I started with the candidate <code>t2.micro</code>, which is free of charge. Unfortunately, the script never succesfully ran the training of the model, presumably because the dimension of merely 1 GB of RAM is not sufficient. Still, a “not possible” result is still a useful result for choosing the right infrastructure.</p>
+<p>Let’s have a first look at the results, first in plain numbers:</p>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>benchmark_df %&gt;% as.tibble()</code></pre>
+<pre><code>## # A tibble: 3 x 7
+##   instance_class instance_size price_per_hour elapsed… accur… ram   num_c…
+##   &lt;chr&gt;          &lt;chr&gt;         &lt;chr&gt;          &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; 
+## 1 t2             micro         0              &lt;NA&gt;     &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;  
+## 2 t2             medium        &lt;NA&gt;           63.961   0.919  &lt;NA&gt;  &lt;NA&gt;  
+## 3 m4             16xlarge      &lt;NA&gt;           93.31    0.915  &lt;NA&gt;  &lt;NA&gt;</code></pre>
+<!-- t2.medium: -->
+<!-- Confusion Matrix and Statistics -->
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  90   0   0   0   0   0   0   1   0   1 -->
+<!--          1   0 114   3   3   0   0   0   0   2   0 -->
+<!--          2   0   0  91   1   2   1   0   0   0   0 -->
+<!--          3   0   1   3  77   0   6   0   0   1   2 -->
+<!--          4   0   0   1   0 104   0   1   7   1   4 -->
+<!--          5   1   0   2   7   0  78   2   0   1   3 -->
+<!--          6   2   0   1   0   1   0 104   0   0   0 -->
+<!--          7   0   0   3   1   0   0   0  93   0   5 -->
+<!--          8   1   1   1   1   0   0   0   0  77   0 -->
+<!--          9   0   0   0   2   2   1   0   1   1  91 -->
+<!-- Overall Statistics -->
+<!--                Accuracy : 0.919 -->
+<!--                  95% CI : (0.9003, 0.9352) -->
+<!--     No Information Rate : 0.116 -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16 -->
+<!--                   Kappa : 0.9099 -->
+<!--  Mcnemar's Test P-Value : NA -->
+<!-- Statistics by Class: -->
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 -->
+<!-- Sensitivity            0.9574   0.9828   0.8667   0.8370   0.9541   0.9070 -->
+<!-- Specificity            0.9978   0.9910   0.9955   0.9857   0.9843   0.9825 -->
+<!-- Pos Pred Value         0.9783   0.9344   0.9579   0.8556   0.8814   0.8298 -->
+<!-- Neg Pred Value         0.9956   0.9977   0.9845   0.9835   0.9943   0.9912 -->
+<!-- Prevalence             0.0940   0.1160   0.1050   0.0920   0.1090   0.0860 -->
+<!-- Detection Rate         0.0900   0.1140   0.0910   0.0770   0.1040   0.0780 -->
+<!-- Detection Prevalence   0.0920   0.1220   0.0950   0.0900   0.1180   0.0940 -->
+<!-- Balanced Accuracy      0.9776   0.9869   0.9311   0.9113   0.9692   0.9447 -->
+<!--                      Class: 6 Class: 7 Class: 8 Class: 9 -->
+<!-- Sensitivity            0.9720   0.9118   0.9277   0.8585 -->
+<!-- Specificity            0.9955   0.9900   0.9956   0.9922 -->
+<!-- Pos Pred Value         0.9630   0.9118   0.9506   0.9286 -->
+<!-- Neg Pred Value         0.9966   0.9900   0.9935   0.9834 -->
+<!-- Prevalence             0.1070   0.1020   0.0830   0.1060 -->
+<!-- Detection Rate         0.1040   0.0930   0.0770   0.0910 -->
+<!-- Detection Prevalence   0.1080   0.1020   0.0810   0.0980 -->
+<!-- Balanced Accuracy      0.9837   0.9509   0.9617   0.9253 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.066024 mins -->
+<!-- m4.16xlarge -->
+<!-- Confusion Matrix and Statistics -->
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  93   0   0   1   1   0   0   0   0   1 -->
+<!--          1   0 100   4   0   1   0   2   5   4   0 -->
+<!--          2   1   0  78   3   2   1   4   1   2   0 -->
+<!--          3   0   1   0 100   0   3   0   0   0   1 -->
+<!--          4   0   0   0   0 100   1   1   6   0   3 -->
+<!--          5   0   1   1   2   0  79   1   0   1   0 -->
+<!--          6   0   0   0   0   1   2  98   0   2   0 -->
+<!--          7   0   0   2   1   0   0   0  96   0   4 -->
+<!--          8   0   3   2   1   0   0   0   0  80   0 -->
+<!--          9   0   0   1   1   4   1   0   3   2  91 -->
+<!-- Overall Statistics -->
+<!--                Accuracy : 0.915 -->
+<!--                  95% CI : (0.896, 0.9315) -->
+<!--     No Information Rate : 0.111 -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16 -->
+<!--                   Kappa : 0.9055 -->
+<!--  Mcnemar's Test P-Value : NA -->
+<!-- Statistics by Class: -->
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9894   0.9524   0.8864   0.9174   0.9174   0.9080   0.9245   0.8649 -->
+<!-- Specificity            0.9967   0.9821   0.9846   0.9944   0.9877   0.9934   0.9944   0.9921 -->
+<!-- Pos Pred Value         0.9687   0.8621   0.8478   0.9524   0.9009   0.9294   0.9515   0.9320 -->
+<!-- Neg Pred Value         0.9989   0.9943   0.9890   0.9899   0.9899   0.9913   0.9911   0.9833 -->
+<!-- Prevalence             0.0940   0.1050   0.0880   0.1090   0.1090   0.0870   0.1060   0.1110 -->
+<!-- Detection Rate         0.0930   0.1000   0.0780   0.1000   0.1000   0.0790   0.0980   0.0960 -->
+<!-- Detection Prevalence   0.0960   0.1160   0.0920   0.1050   0.1110   0.0850   0.1030   0.1030 -->
+<!-- Balanced Accuracy      0.9930   0.9673   0.9355   0.9559   0.9525   0.9507   0.9595   0.9285 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.8791   0.9100 -->
+<!-- Specificity            0.9934   0.9867 -->
+<!-- Pos Pred Value         0.9302   0.8835 -->
+<!-- Neg Pred Value         0.9880   0.9900 -->
+<!-- Prevalence             0.0910   0.1000 -->
+<!-- Detection Rate         0.0800   0.0910 -->
+<!-- Detection Prevalence   0.0860   0.1030 -->
+<!-- Balanced Accuracy      0.9363   0.9483 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.555173 mins -->
 </div>
