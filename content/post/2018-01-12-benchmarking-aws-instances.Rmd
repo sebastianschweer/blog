@@ -16,14 +16,14 @@ tags:
 
 In [a previous post](/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/)I have shown you how to setup an AWS instance running the newest RStudio, R, Python, Julia and so forth, where the configuration of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:
 
-![...why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!](/img/screenshot_finish_button.png)
+[...why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!]()
 
 These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!
 
 ## The Test
 For this benchmark test I chose a classical machine learning task: the classification of the [MNIST](LINK) dataset of handwritten digits, to be categorized as 0-9. This data set has been used to gauge the accuracy of machine learning algorithms since 
 
-For this benchmark test, I borrowed a nice skript by XXX written here, which trains a Support Vector Machine (SVM) on the problem, using only the first 1000 observations of the dataset, each with 768 attributes. I altered the code ever so slightly to that each run of the script returns the following measurements:
+For this benchmark test, I borrowed a nice skript by Kory Becker written [here](https://gist.github.com/primaryobjects/b0c8333834debbc15be4), which trains a Support Vector Machine (SVM) on the problem, using only the first 1000 observations of the dataset, each with 768 attributes. I altered the code ever so slightly to that each run of the script returns the following measurements:
 
 1. Elapsed Time: The time elapsed since starting the script (excluding the time to install the libraries and download of the data),
 2. Accuracy of model, i.e. the percentage of predictions that classified the digits correctly.
@@ -42,49 +42,194 @@ AWS provides a large number of different configurations, and I will not discuss 
 
 For each of these classes, I had planned to test the sizes small, medium, large, xlarge and 2xlarge. The sizes micro, small and medium are actually only available for t2 (oh, no!), so that I ended up only testing 14 configurations. 
 
-## The results
+## The Results
 
 I started with the candidate `t2.micro`, which is free of charge. Unfortunately, the script never succesfully ran the training of the model, presumably because the dimension of merely 1 GB of RAM is not sufficient. Still, a "not possible" result is still a useful result for choosing the right infrastructure.
 
 Let's have a first look at the results, first in plain numbers:
 ```{r echo=FALSE}
-library(dplyr)
-library(tibble)
+suppressMessages(library(dplyr))
+suppressMessages(library(tibble))
 
 t2_micro <- 
   c(instance_class = "t2",
     instance_size  = "micro",
-    price_per_hour = 0,
+    ram = 1, 
+    vcpus = 1,
+    ecu = NA, 
+    price_per_hour = 0.0134,
     elapsed_time = NA,
     accuracy = NA)
 
 t2_medium <- 
   c(instance_class = "t2",
     instance_size  = "medium",
-    price_per_hour = NA,
-    ram = NA,
-    num_cpus = NA,
+    ram = 4, 
+    vcpus = 2,
+    ecu = NA, 
+    price_per_hour = 0.0536,
     elapsed_time = 63.961,
     accuracy = 0.919)
 
 m4_16xlarge <- 
   c(instance_class = "m4",
     instance_size  = "16xlarge",
-    price_per_hour = NA,
-    ram = NA,
-    num_cpus = NA,
+    ram = 256, 
+    vcpus = 64,
+    ecu = 188, 
+    price_per_hour = 3.84,
     elapsed_time = 93.310,
     accuracy = 0.915)
+
+t2_2xlarge <- 
+  c(instance_class = "t2",
+    instance_size  = "2xlarge",
+    ram = 32, 
+    vcpus = 8,
+    ecu = NA, 
+    price_per_hour = 0.4288,
+    elapsed_time = 56.284,
+    accuracy = 0.919)
+
+
+t2_small <- 
+  c(instance_class = "t2",
+    instance_size  = "small",
+    ram = 2, 
+    vcpus = 1,
+    ecu = NA, 
+    price_per_hour = 0.0268,
+    elapsed_time = 68.624,
+    accuracy = 0.917)
+
+t2_large <-
+  c(instance_class = "t2",
+    instance_size  = "large",
+    ram = 8, 
+    vcpus = 2,
+    ecu = NA, 
+    price_per_hour = 0.1072,
+    elapsed_time = 65.335,
+    accuracy = 0.918)
+
+t2_xlarge <-
+  c(instance_class = "t2",
+    instance_size  = "xlarge",
+    ram = 16, 
+    vcpus = 4,
+    ecu = NA, 
+    price_per_hour = 0.2144,
+    elapsed_time = 55.611,
+    accuracy = 0.918)
+
+m4_large <- 
+  c(instance_class = "m4",
+    instance_size  = "large",
+    ram = 8, 
+    vcpus = 2,
+    ecu = 6.5, 
+    price_per_hour = 0.12,
+    elapsed_time = 82.823,
+    accuracy = 0.933)
+
+m4_xlarge <- 
+  c(instance_class = "m4",
+    instance_size  = "xlarge",
+    ram = 15, 
+    vcpus = 4,
+    ecu = 13, 
+    price_per_hour = 0.24,
+    elapsed_time = 80.749,
+    accuracy = 0.928)
+
+r4_large <- 
+  c(instance_class = "r4",
+    instance_size  = "large",
+    ram = 15.25, 
+    vcpus = 2,
+    ecu = 7, 
+    price_per_hour = 0.16,
+    elapsed_time = 80.749,
+    accuracy = 0.928)
+
+r4_xlarge <- 
+  c(instance_class = "r4",
+    instance_size  = "xlarge",
+    ram = 30.5, 
+    vcpus = 13.5,
+    ecu = 4, 
+    price_per_hour = 0.32,
+    elapsed_time = 68.372,
+    accuracy = 0.92)
+
+c4_large <- 
+  c(instance_class = "c4",
+    instance_size  = "large",
+    ram = 3.75, 
+    vcpus = 2,
+    ecu = 8, 
+    price_per_hour = 0.114,
+    elapsed_time = 121.004,
+    accuracy = 0.915)
+
+m4_2xlarge <- 
+  c(instance_class = "m4",
+    instance_size  = "2xlarge",
+    ram = 32, 
+    vcpus = 8,
+    ecu = 26, 
+    price_per_hour = 0.48,
+    elapsed_time = 65.728,
+    accuracy = 0.912)
+
+m4_4xlarge <- 
+  c(instance_class = "m4",
+    instance_size  = "4xlarge",
+    ram = 64, 
+    vcpus = 16,
+    ecu = 53.5, 
+    price_per_hour = 0.96,
+    elapsed_time = 64.573,
+    accuracy = 0.927)
 
 
 benchmark_df <- 
   bind_rows(t2_micro,
+            t2_small,
+            t2_large,
+            t2_xlarge,
+            t2_2xlarge,
             t2_medium,
-            m4_16xlarge)
+            m4_large,
+            m4_xlarge,
+            m4_2xlarge,
+            m4_4xlarge,
+            m4_16xlarge,
+            r4_large,
+            r4_xlarge,
+            c4_large) %>%
+  mutate_at(vars(one_of(c("accuracy", "elapsed_time", "ram", "vcpus", "ecu", "price_per_hour"))),
+            funs(as.numeric))
 ```
 
-```{r}
-benchmark_df %>% as.tibble()
+```{r, echo = FALSE, include=TRUE}
+benchmark_df
+```
+
+## Which factors influence performance?
+
+In order to establish the most influential factors, we use the wonderful "ggpairs" visualization of the `GGally` package.
+
+```{r, echo = FALSE}
+suppressMessages(library(ggplot2))
+suppressMessages(library(GGally))
+plot_pairs <- ggpairs(benchmark_df %>% filter(instance_size != "16xlarge"), 
+                      mapping = aes(color = instance_class), 
+                      columns = c("ram", "vcpus", "price_per_hour", "elapsed_time"))
+```
+
+```{r, echo = FALSE, include=TRUE, warning=FALSE}
+suppressWarnings(plot_pairs)
 ```
 
 
@@ -240,407 +385,508 @@ benchmark_df %>% as.tibble()
 <!-- > duration -->
 <!-- Time difference of 56.28423 secs -->
 
-t2.small
-Confusion Matrix and Statistics
+<!-- t2.small -->
+<!-- Confusion Matrix and Statistics -->
 
-          Reference
-Prediction   0   1   2   3   4   5   6   7   8   9
-         0  88   0   1   0   0   0   0   1   0   1
-         1   0 110   4   1   1   0   4   3   2   0
-         2   0   2  89   1   2   2   1   0   0   0
-         3   1   1   0  85   0   2   0   0   2   0
-         4   0   0   7   0 110   2   1   2   0   2
-         5   1   1   1   0   0  72   3   0   7   0
-         6   0   0   1   0   1   2  89   0   2   0
-         7   0   0   0   2   0   0   0 111   0   3
-         8   0   0   1   0   0   0   0   0  74   0
-         9   0   0   0   3   3   1   0   0   5  89
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  88   0   1   0   0   0   0   1   0   1 -->
+<!--          1   0 110   4   1   1   0   4   3   2   0 -->
+<!--          2   0   2  89   1   2   2   1   0   0   0 -->
+<!--          3   1   1   0  85   0   2   0   0   2   0 -->
+<!--          4   0   0   7   0 110   2   1   2   0   2 -->
+<!--          5   1   1   1   0   0  72   3   0   7   0 -->
+<!--          6   0   0   1   0   1   2  89   0   2   0 -->
+<!--          7   0   0   0   2   0   0   0 111   0   3 -->
+<!--          8   0   0   1   0   0   0   0   0  74   0 -->
+<!--          9   0   0   0   3   3   1   0   0   5  89 -->
 
-Overall Statistics
-                                          
-               Accuracy : 0.917           
-                 95% CI : (0.8981, 0.9334)
-    No Information Rate : 0.117           
-    P-Value [Acc > NIR] : < 2.2e-16       
-                                          
-                  Kappa : 0.9076          
- Mcnemar's Test P-Value : NA              
+<!-- Overall Statistics -->
 
-Statistics by Class:
+<!--                Accuracy : 0.917            -->
+<!--                  95% CI : (0.8981, 0.9334) -->
+<!--     No Information Rate : 0.117            -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16        -->
 
-                     Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5
-Sensitivity            0.9778   0.9649   0.8558   0.9239   0.9402   0.8889
-Specificity            0.9967   0.9831   0.9911   0.9934   0.9841   0.9859
-Pos Pred Value         0.9670   0.8800   0.9175   0.9341   0.8871   0.8471
-Neg Pred Value         0.9978   0.9954   0.9834   0.9923   0.9920   0.9902
-Prevalence             0.0900   0.1140   0.1040   0.0920   0.1170   0.0810
-Detection Rate         0.0880   0.1100   0.0890   0.0850   0.1100   0.0720
-Detection Prevalence   0.0910   0.1250   0.0970   0.0910   0.1240   0.0850
-Balanced Accuracy      0.9872   0.9740   0.9234   0.9587   0.9622   0.9374
-                     Class: 6 Class: 7 Class: 8 Class: 9
-Sensitivity            0.9082   0.9487   0.8043   0.9368
-Specificity            0.9933   0.9943   0.9989   0.9867
-Pos Pred Value         0.9368   0.9569   0.9867   0.8812
-Neg Pred Value         0.9901   0.9932   0.9805   0.9933
-Prevalence             0.0980   0.1170   0.0920   0.0950
-Detection Rate         0.0890   0.1110   0.0740   0.0890
-Detection Prevalence   0.0950   0.1160   0.0750   0.1010
-Balanced Accuracy      0.9508   0.9715   0.9016   0.9618
-> duration <- Sys.time() - start
-> duration
-Time difference of 1.143735 mins
+<!--                   Kappa : 0.9076           -->
+<!--  Mcnemar's Test P-Value : NA               -->
 
-t2.large
-Confusion Matrix and Statistics
+<!-- Statistics by Class: -->
 
-          Reference
-Prediction   0   1   2   3   4   5   6   7   8   9
-         0  83   0   0   1   0   1   0   1   0   1
-         1   0 115   0   0   0   1   1   5   3   0
-         2   0   0  87   3   0   1   1   2   3   0
-         3   0   1   0  87   0   3   0   0   1   2
-         4   0   0   3   0  91   0   1   2   0   2
-         5   1   1   0   6   0  86   2   0   2   0
-         6   0   0   1   0   4   2  96   0   1   0
-         7   0   0   0   1   0   0   0 110   0   3
-         8   0   0   1   0   0   1   0   0  74   0
-         9   0   0   0   1   6   2   0   5   3  89
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 -->
+<!-- Sensitivity            0.9778   0.9649   0.8558   0.9239   0.9402   0.8889 -->
+<!-- Specificity            0.9967   0.9831   0.9911   0.9934   0.9841   0.9859 -->
+<!-- Pos Pred Value         0.9670   0.8800   0.9175   0.9341   0.8871   0.8471 -->
+<!-- Neg Pred Value         0.9978   0.9954   0.9834   0.9923   0.9920   0.9902 -->
+<!-- Prevalence             0.0900   0.1140   0.1040   0.0920   0.1170   0.0810 -->
+<!-- Detection Rate         0.0880   0.1100   0.0890   0.0850   0.1100   0.0720 -->
+<!-- Detection Prevalence   0.0910   0.1250   0.0970   0.0910   0.1240   0.0850 -->
+<!-- Balanced Accuracy      0.9872   0.9740   0.9234   0.9587   0.9622   0.9374 -->
+<!--                      Class: 6 Class: 7 Class: 8 Class: 9 -->
+<!-- Sensitivity            0.9082   0.9487   0.8043   0.9368 -->
+<!-- Specificity            0.9933   0.9943   0.9989   0.9867 -->
+<!-- Pos Pred Value         0.9368   0.9569   0.9867   0.8812 -->
+<!-- Neg Pred Value         0.9901   0.9932   0.9805   0.9933 -->
+<!-- Prevalence             0.0980   0.1170   0.0920   0.0950 -->
+<!-- Detection Rate         0.0890   0.1110   0.0740   0.0890 -->
+<!-- Detection Prevalence   0.0950   0.1160   0.0750   0.1010 -->
+<!-- Balanced Accuracy      0.9508   0.9715   0.9016   0.9618 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.143735 mins -->
 
-Overall Statistics
-                                          
-               Accuracy : 0.918           
-                 95% CI : (0.8992, 0.9343)
-    No Information Rate : 0.125           
-    P-Value [Acc > NIR] : < 2.2e-16       
-                                          
-                  Kappa : 0.9088          
- Mcnemar's Test P-Value : NA              
+<!-- t2.large -->
+<!-- Confusion Matrix and Statistics -->
 
-Statistics by Class:
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  83   0   0   1   0   1   0   1   0   1 -->
+<!--          1   0 115   0   0   0   1   1   5   3   0 -->
+<!--          2   0   0  87   3   0   1   1   2   3   0 -->
+<!--          3   0   1   0  87   0   3   0   0   1   2 -->
+<!--          4   0   0   3   0  91   0   1   2   0   2 -->
+<!--          5   1   1   0   6   0  86   2   0   2   0 -->
+<!--          6   0   0   1   0   4   2  96   0   1   0 -->
+<!--          7   0   0   0   1   0   0   0 110   0   3 -->
+<!--          8   0   0   1   0   0   1   0   0  74   0 -->
+<!--          9   0   0   0   1   6   2   0   5   3  89 -->
 
-                     Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
-Sensitivity            0.9881   0.9829   0.9457   0.8788   0.9010   0.8866   0.9505   0.8800
-Specificity            0.9956   0.9887   0.9890   0.9922   0.9911   0.9867   0.9911   0.9954
-Pos Pred Value         0.9540   0.9200   0.8969   0.9255   0.9192   0.8776   0.9231   0.9649
-Neg Pred Value         0.9989   0.9977   0.9945   0.9868   0.9889   0.9878   0.9944   0.9831
-Prevalence             0.0840   0.1170   0.0920   0.0990   0.1010   0.0970   0.1010   0.1250
-Detection Rate         0.0830   0.1150   0.0870   0.0870   0.0910   0.0860   0.0960   0.1100
-Detection Prevalence   0.0870   0.1250   0.0970   0.0940   0.0990   0.0980   0.1040   0.1140
-Balanced Accuracy      0.9919   0.9858   0.9673   0.9355   0.9460   0.9367   0.9708   0.9377
-                     Class: 8 Class: 9
-Sensitivity            0.8506   0.9175
-Specificity            0.9978   0.9812
-Pos Pred Value         0.9737   0.8396
-Neg Pred Value         0.9859   0.9911
-Prevalence             0.0870   0.0970
-Detection Rate         0.0740   0.0890
-Detection Prevalence   0.0760   0.1060
-Balanced Accuracy      0.9242   0.9493
-> duration <- Sys.time() - start
-> duration
-Time difference of 1.088912 mins
+<!-- Overall Statistics -->
 
-t2.xlarge
-Confusion Matrix and Statistics
+<!--                Accuracy : 0.918            -->
+<!--                  95% CI : (0.8992, 0.9343) -->
+<!--     No Information Rate : 0.125            -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16        -->
 
-          Reference
-Prediction   0   1   2   3   4   5   6   7   8   9
-         0  98   0   0   0   0   0   0   1   0   1
-         1   0  99   3   2   0   0   3   4   2   0
-         2   1   0  91   3   3   1   1   0   0   0
-         3   0   0   0  86   0   4   0   0   1   1
-         4   0   0   2   0 103   1   1   4   0   6
-         5   3   0   0   4   0  84   2   0   1   1
-         6   2   0   0   0   1   1  80   0   3   0
-         7   0   1   0   0   0   0   0  98   0   1
-         8   0   0   2   0   0   0   0   0  74   0
-         9   0   0   1   1   1   4   0   4   4 105
+<!--                   Kappa : 0.9088           -->
+<!--  Mcnemar's Test P-Value : NA               -->
 
-Overall Statistics
-                                          
-               Accuracy : 0.918           
-                 95% CI : (0.8992, 0.9343)
-    No Information Rate : 0.115           
-    P-Value [Acc > NIR] : < 2.2e-16       
-                                          
-                  Kappa : 0.9088          
- Mcnemar's Test P-Value : NA              
+<!-- Statistics by Class: -->
 
-Statistics by Class:
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9881   0.9829   0.9457   0.8788   0.9010   0.8866   0.9505   0.8800 -->
+<!-- Specificity            0.9956   0.9887   0.9890   0.9922   0.9911   0.9867   0.9911   0.9954 -->
+<!-- Pos Pred Value         0.9540   0.9200   0.8969   0.9255   0.9192   0.8776   0.9231   0.9649 -->
+<!-- Neg Pred Value         0.9989   0.9977   0.9945   0.9868   0.9889   0.9878   0.9944   0.9831 -->
+<!-- Prevalence             0.0840   0.1170   0.0920   0.0990   0.1010   0.0970   0.1010   0.1250 -->
+<!-- Detection Rate         0.0830   0.1150   0.0870   0.0870   0.0910   0.0860   0.0960   0.1100 -->
+<!-- Detection Prevalence   0.0870   0.1250   0.0970   0.0940   0.0990   0.0980   0.1040   0.1140 -->
+<!-- Balanced Accuracy      0.9919   0.9858   0.9673   0.9355   0.9460   0.9367   0.9708   0.9377 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.8506   0.9175 -->
+<!-- Specificity            0.9978   0.9812 -->
+<!-- Pos Pred Value         0.9737   0.8396 -->
+<!-- Neg Pred Value         0.9859   0.9911 -->
+<!-- Prevalence             0.0870   0.0970 -->
+<!-- Detection Rate         0.0740   0.0890 -->
+<!-- Detection Prevalence   0.0760   0.1060 -->
+<!-- Balanced Accuracy      0.9242   0.9493 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.088912 mins -->
 
-                     Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
-Sensitivity            0.9423   0.9900   0.9192   0.8958   0.9537   0.8842   0.9195   0.8829
-Specificity            0.9978   0.9844   0.9900   0.9934   0.9843   0.9878   0.9923   0.9978
-Pos Pred Value         0.9800   0.8761   0.9100   0.9348   0.8803   0.8842   0.9195   0.9800
-Neg Pred Value         0.9933   0.9989   0.9911   0.9890   0.9943   0.9878   0.9923   0.9856
-Prevalence             0.1040   0.1000   0.0990   0.0960   0.1080   0.0950   0.0870   0.1110
-Detection Rate         0.0980   0.0990   0.0910   0.0860   0.1030   0.0840   0.0800   0.0980
-Detection Prevalence   0.1000   0.1130   0.1000   0.0920   0.1170   0.0950   0.0870   0.1000
-Balanced Accuracy      0.9700   0.9872   0.9546   0.9446   0.9690   0.9360   0.9559   0.9403
-                     Class: 8 Class: 9
-Sensitivity            0.8706   0.9130
-Specificity            0.9978   0.9831
-Pos Pred Value         0.9737   0.8750
-Neg Pred Value         0.9881   0.9886
-Prevalence             0.0850   0.1150
-Detection Rate         0.0740   0.1050
-Detection Prevalence   0.0760   0.1200
-Balanced Accuracy      0.9342   0.9480
-> duration <- Sys.time() - start
-> duration
-Time difference of 55.61071 secs
+<!-- t2.xlarge -->
+<!-- Confusion Matrix and Statistics -->
 
-m4.large
-Confusion Matrix and Statistics
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  98   0   0   0   0   0   0   1   0   1 -->
+<!--          1   0  99   3   2   0   0   3   4   2   0 -->
+<!--          2   1   0  91   3   3   1   1   0   0   0 -->
+<!--          3   0   0   0  86   0   4   0   0   1   1 -->
+<!--          4   0   0   2   0 103   1   1   4   0   6 -->
+<!--          5   3   0   0   4   0  84   2   0   1   1 -->
+<!--          6   2   0   0   0   1   1  80   0   3   0 -->
+<!--          7   0   1   0   0   0   0   0  98   0   1 -->
+<!--          8   0   0   2   0   0   0   0   0  74   0 -->
+<!--          9   0   0   1   1   1   4   0   4   4 105 -->
 
-          Reference
-Prediction   0   1   2   3   4   5   6   7   8   9
-         0 102   0   0   1   0   0   1   1   0   0
-         1   0 119   1   0   2   0   1   2   2   0
-         2   1   1  86   1   2   2   0   0   2   0
-         3   1   0   1  70   0   1   0   0   2   0
-         4   0   0   3   0  97   1   0   6   1   2
-         5   0   1   2   3   0  81   3   0   3   0
-         6   2   0   3   1   0   2  95   0   1   0
-         7   0   1   4   2   1   0   0 101   0   1
-         8   0   2   2   2   0   0   1   0  67   0
-         9   0   0   0   1   4   0   0   1   1 100
+<!-- Overall Statistics -->
 
-Overall Statistics
-                                          
-               Accuracy : 0.918           
-                 95% CI : (0.8992, 0.9343)
-    No Information Rate : 0.124           
-    P-Value [Acc > NIR] : < 2.2e-16       
-                                          
-                  Kappa : 0.9087          
- Mcnemar's Test P-Value : NA              
+<!--                Accuracy : 0.918            -->
+<!--                  95% CI : (0.8992, 0.9343) -->
+<!--     No Information Rate : 0.115            -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16        -->
 
-Statistics by Class:
+<!--                   Kappa : 0.9088           -->
+<!--  Mcnemar's Test P-Value : NA               -->
 
-                     Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
-Sensitivity            0.9623   0.9597   0.8431   0.8642   0.9151   0.9310   0.9406   0.9099
-Specificity            0.9966   0.9909   0.9900   0.9946   0.9855   0.9869   0.9900   0.9899
-Pos Pred Value         0.9714   0.9370   0.9053   0.9333   0.8818   0.8710   0.9135   0.9182
-Neg Pred Value         0.9955   0.9943   0.9823   0.9881   0.9899   0.9934   0.9933   0.9888
-Prevalence             0.1060   0.1240   0.1020   0.0810   0.1060   0.0870   0.1010   0.1110
-Detection Rate         0.1020   0.1190   0.0860   0.0700   0.0970   0.0810   0.0950   0.1010
-Detection Prevalence   0.1050   0.1270   0.0950   0.0750   0.1100   0.0930   0.1040   0.1100
-Balanced Accuracy      0.9795   0.9753   0.9166   0.9294   0.9503   0.9589   0.9653   0.9499
-                     Class: 8 Class: 9
-Sensitivity            0.8481   0.9709
-Specificity            0.9924   0.9922
-Pos Pred Value         0.9054   0.9346
-Neg Pred Value         0.9870   0.9966
-Prevalence             0.0790   0.1030
-Detection Rate         0.0670   0.1000
-Detection Prevalence   0.0740   0.1070
-Balanced Accuracy      0.9203   0.9815
-> duration <- Sys.time() - start
-> duration
-Time difference of 1.38039 mins
+<!-- Statistics by Class: -->
 
-m4.xlarge
-Confusion Matrix and Statistics
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9423   0.9900   0.9192   0.8958   0.9537   0.8842   0.9195   0.8829 -->
+<!-- Specificity            0.9978   0.9844   0.9900   0.9934   0.9843   0.9878   0.9923   0.9978 -->
+<!-- Pos Pred Value         0.9800   0.8761   0.9100   0.9348   0.8803   0.8842   0.9195   0.9800 -->
+<!-- Neg Pred Value         0.9933   0.9989   0.9911   0.9890   0.9943   0.9878   0.9923   0.9856 -->
+<!-- Prevalence             0.1040   0.1000   0.0990   0.0960   0.1080   0.0950   0.0870   0.1110 -->
+<!-- Detection Rate         0.0980   0.0990   0.0910   0.0860   0.1030   0.0840   0.0800   0.0980 -->
+<!-- Detection Prevalence   0.1000   0.1130   0.1000   0.0920   0.1170   0.0950   0.0870   0.1000 -->
+<!-- Balanced Accuracy      0.9700   0.9872   0.9546   0.9446   0.9690   0.9360   0.9559   0.9403 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.8706   0.9130 -->
+<!-- Specificity            0.9978   0.9831 -->
+<!-- Pos Pred Value         0.9737   0.8750 -->
+<!-- Neg Pred Value         0.9881   0.9886 -->
+<!-- Prevalence             0.0850   0.1150 -->
+<!-- Detection Rate         0.0740   0.1050 -->
+<!-- Detection Prevalence   0.0760   0.1200 -->
+<!-- Balanced Accuracy      0.9342   0.9480 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 55.61071 secs -->
 
-          Reference
-Prediction   0   1   2   3   4   5   6   7   8   9
-         0  89   0   1   1   0   0   0   1   0   2
-         1   0 111   1   0   1   0   1   0   1   0
-         2   1   1  97   0   3   0   1   1   2   1
-         3   1   1   0  87   0   3   0   0   4   1
-         4   0   0   1   0 112   0   0   1   0   2
-         5   0   3   0   3   0  81   1   0   0   1
-         6   0   0   2   0   3   3  84   0   0   0
-         7   0   0   2   0   2   0   0 107   0   5
-         8   0   1   1   0   0   0   0   0  87   0
-         9   0   0   0   1   3   1   0   0   2  78
+<!-- m4.large -->
+<!-- Confusion Matrix and Statistics -->
 
-Overall Statistics
-                                          
-               Accuracy : 0.933           
-                 95% CI : (0.9157, 0.9477)
-    No Information Rate : 0.124           
-    P-Value [Acc > NIR] : < 2.2e-16       
-                                          
-                  Kappa : 0.9254          
- Mcnemar's Test P-Value : NA              
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0 102   0   0   1   0   0   1   1   0   0 -->
+<!--          1   0 119   1   0   2   0   1   2   2   0 -->
+<!--          2   1   1  86   1   2   2   0   0   2   0 -->
+<!--          3   1   0   1  70   0   1   0   0   2   0 -->
+<!--          4   0   0   3   0  97   1   0   6   1   2 -->
+<!--          5   0   1   2   3   0  81   3   0   3   0 -->
+<!--          6   2   0   3   1   0   2  95   0   1   0 -->
+<!--          7   0   1   4   2   1   0   0 101   0   1 -->
+<!--          8   0   2   2   2   0   0   1   0  67   0 -->
+<!--          9   0   0   0   1   4   0   0   1   1 100 -->
 
-Statistics by Class:
+<!-- Overall Statistics -->
 
-                     Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
-Sensitivity            0.9780   0.9487   0.9238   0.9457   0.9032   0.9205   0.9655   0.9727
-Specificity            0.9945   0.9955   0.9888   0.9890   0.9954   0.9912   0.9912   0.9899
-Pos Pred Value         0.9468   0.9652   0.9065   0.8969   0.9655   0.9101   0.9130   0.9224
-Neg Pred Value         0.9978   0.9932   0.9910   0.9945   0.9864   0.9923   0.9967   0.9966
-Prevalence             0.0910   0.1170   0.1050   0.0920   0.1240   0.0880   0.0870   0.1100
-Detection Rate         0.0890   0.1110   0.0970   0.0870   0.1120   0.0810   0.0840   0.1070
-Detection Prevalence   0.0940   0.1150   0.1070   0.0970   0.1160   0.0890   0.0920   0.1160
-Balanced Accuracy      0.9863   0.9721   0.9563   0.9673   0.9493   0.9558   0.9784   0.9813
-                     Class: 8 Class: 9
-Sensitivity            0.9062   0.8667
-Specificity            0.9978   0.9923
-Pos Pred Value         0.9775   0.9176
-Neg Pred Value         0.9901   0.9869
-Prevalence             0.0960   0.0900
-Detection Rate         0.0870   0.0780
-Detection Prevalence   0.0890   0.0850
-Balanced Accuracy      0.9520   0.9295
-> duration <- Sys.time() - start
-> duration
-Time difference of 1.142918 mins
+<!--                Accuracy : 0.918            -->
+<!--                  95% CI : (0.8992, 0.9343) -->
+<!--     No Information Rate : 0.124            -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16        -->
 
-r4.large
-Confusion Matrix and Statistics
+<!--                   Kappa : 0.9087           -->
+<!--  Mcnemar's Test P-Value : NA               -->
 
-          Reference
-Prediction   0   1   2   3   4   5   6   7   8   9
-         0  90   0   0   1   1   0   0   0   0   1
-         1   0 112   1   4   1   0   1   3   1   0
-         2   1   0  83   1   1   1   1   0   3   1
-         3   1   0   1  85   0   0   0   0   0   2
-         4   0   0   2   0  99   0   1   4   0   3
-         5   0   1   1   8   0  91   2   0   2   0
-         6   0   0   0   1   0   2 104   0   2   0
-         7   0   0   0   1   0   0   0  95   0   6
-         8   0   0   1   0   0   0   0   0  75   0
-         9   0   0   0   1   3   1   0   2   1  94
+<!-- Statistics by Class: -->
 
-Overall Statistics
-                                          
-               Accuracy : 0.928           
-                 95% CI : (0.9102, 0.9432)
-    No Information Rate : 0.113           
-    P-Value [Acc > NIR] : < 2.2e-16       
-                                          
-                  Kappa : 0.9199          
- Mcnemar's Test P-Value : NA              
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9623   0.9597   0.8431   0.8642   0.9151   0.9310   0.9406   0.9099 -->
+<!-- Specificity            0.9966   0.9909   0.9900   0.9946   0.9855   0.9869   0.9900   0.9899 -->
+<!-- Pos Pred Value         0.9714   0.9370   0.9053   0.9333   0.8818   0.8710   0.9135   0.9182 -->
+<!-- Neg Pred Value         0.9955   0.9943   0.9823   0.9881   0.9899   0.9934   0.9933   0.9888 -->
+<!-- Prevalence             0.1060   0.1240   0.1020   0.0810   0.1060   0.0870   0.1010   0.1110 -->
+<!-- Detection Rate         0.1020   0.1190   0.0860   0.0700   0.0970   0.0810   0.0950   0.1010 -->
+<!-- Detection Prevalence   0.1050   0.1270   0.0950   0.0750   0.1100   0.0930   0.1040   0.1100 -->
+<!-- Balanced Accuracy      0.9795   0.9753   0.9166   0.9294   0.9503   0.9589   0.9653   0.9499 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.8481   0.9709 -->
+<!-- Specificity            0.9924   0.9922 -->
+<!-- Pos Pred Value         0.9054   0.9346 -->
+<!-- Neg Pred Value         0.9870   0.9966 -->
+<!-- Prevalence             0.0790   0.1030 -->
+<!-- Detection Rate         0.0670   0.1000 -->
+<!-- Detection Prevalence   0.0740   0.1070 -->
+<!-- Balanced Accuracy      0.9203   0.9815 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.38039 mins -->
 
-Statistics by Class:
+<!-- m4.xlarge -->
+<!-- Confusion Matrix and Statistics -->
 
-                     Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
-Sensitivity            0.9783   0.9912   0.9326   0.8333   0.9429   0.9579   0.9541   0.9135
-Specificity            0.9967   0.9876   0.9901   0.9955   0.9888   0.9845   0.9944   0.9922
-Pos Pred Value         0.9677   0.9106   0.9022   0.9551   0.9083   0.8667   0.9541   0.9314
-Neg Pred Value         0.9978   0.9989   0.9934   0.9813   0.9933   0.9955   0.9944   0.9900
-Prevalence             0.0920   0.1130   0.0890   0.1020   0.1050   0.0950   0.1090   0.1040
-Detection Rate         0.0900   0.1120   0.0830   0.0850   0.0990   0.0910   0.1040   0.0950
-Detection Prevalence   0.0930   0.1230   0.0920   0.0890   0.1090   0.1050   0.1090   0.1020
-Balanced Accuracy      0.9875   0.9894   0.9614   0.9144   0.9658   0.9712   0.9743   0.9528
-                     Class: 8 Class: 9
-Sensitivity            0.8929   0.8785
-Specificity            0.9989   0.9910
-Pos Pred Value         0.9868   0.9216
-Neg Pred Value         0.9903   0.9855
-Prevalence             0.0840   0.1070
-Detection Rate         0.0750   0.0940
-Detection Prevalence   0.0760   0.1020
-Balanced Accuracy      0.9459   0.9348
-> duration <- Sys.time() - start
-> duration
-Time difference of 1.345818 mins
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  89   0   1   1   0   0   0   1   0   2 -->
+<!--          1   0 111   1   0   1   0   1   0   1   0 -->
+<!--          2   1   1  97   0   3   0   1   1   2   1 -->
+<!--          3   1   1   0  87   0   3   0   0   4   1 -->
+<!--          4   0   0   1   0 112   0   0   1   0   2 -->
+<!--          5   0   3   0   3   0  81   1   0   0   1 -->
+<!--          6   0   0   2   0   3   3  84   0   0   0 -->
+<!--          7   0   0   2   0   2   0   0 107   0   5 -->
+<!--          8   0   1   1   0   0   0   0   0  87   0 -->
+<!--          9   0   0   0   1   3   1   0   0   2  78 -->
 
-r4.xlarge
-Confusion Matrix and Statistics
+<!-- Overall Statistics -->
 
-          Reference
-Prediction   0   1   2   3   4   5   6   7   8   9
-         0  93   0   0   1   0   0   0   1   0   1
-         1   0 106   1   1   0   0   1   2   1   0
-         2   0   1  89   2   0   1   0   1   2   0
-         3   0   0   2  84   0   2   0   0   1   3
-         4   0   0   0   0 102   2   2   4   0   1
-         5   0   1   1   2   0  96   1   0   2   0
-         6   1   0   1   0   0   2  88   0   4   0
-         7   0   0   2   1   0   0   0  98   1   5
-         8   0   2   6   1   0   0   0   0  75   0
-         9   0   0   0   2   7   1   0   3   1  89
+<!--                Accuracy : 0.933            -->
+<!--                  95% CI : (0.9157, 0.9477) -->
+<!--     No Information Rate : 0.124            -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16        -->
 
-Overall Statistics
-                                          
-               Accuracy : 0.92            
-                 95% CI : (0.9014, 0.9361)
-    No Information Rate : 0.11            
-    P-Value [Acc > NIR] : < 2.2e-16       
-                                          
-                  Kappa : 0.9111          
- Mcnemar's Test P-Value : NA              
+<!--                   Kappa : 0.9254           -->
+<!--  Mcnemar's Test P-Value : NA               -->
 
-Statistics by Class:
+<!-- Statistics by Class: -->
 
-                     Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
-Sensitivity            0.9894   0.9636   0.8725   0.8936   0.9358   0.9231   0.9565   0.8991
-Specificity            0.9967   0.9933   0.9922   0.9912   0.9899   0.9922   0.9912   0.9899
-Pos Pred Value         0.9687   0.9464   0.9271   0.9130   0.9189   0.9320   0.9167   0.9159
-Neg Pred Value         0.9989   0.9955   0.9856   0.9890   0.9921   0.9911   0.9956   0.9877
-Prevalence             0.0940   0.1100   0.1020   0.0940   0.1090   0.1040   0.0920   0.1090
-Detection Rate         0.0930   0.1060   0.0890   0.0840   0.1020   0.0960   0.0880   0.0980
-Detection Prevalence   0.0960   0.1120   0.0960   0.0920   0.1110   0.1030   0.0960   0.1070
-Balanced Accuracy      0.9930   0.9784   0.9324   0.9424   0.9628   0.9576   0.9739   0.9445
-                     Class: 8 Class: 9
-Sensitivity            0.8621   0.8990
-Specificity            0.9901   0.9845
-Pos Pred Value         0.8929   0.8641
-Neg Pred Value         0.9869   0.9889
-Prevalence             0.0870   0.0990
-Detection Rate         0.0750   0.0890
-Detection Prevalence   0.0840   0.1030
-Balanced Accuracy      0.9261   0.9417
-> duration <- Sys.time() - start
-> duration
-Time difference of 1.139538 mins
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9780   0.9487   0.9238   0.9457   0.9032   0.9205   0.9655   0.9727 -->
+<!-- Specificity            0.9945   0.9955   0.9888   0.9890   0.9954   0.9912   0.9912   0.9899 -->
+<!-- Pos Pred Value         0.9468   0.9652   0.9065   0.8969   0.9655   0.9101   0.9130   0.9224 -->
+<!-- Neg Pred Value         0.9978   0.9932   0.9910   0.9945   0.9864   0.9923   0.9967   0.9966 -->
+<!-- Prevalence             0.0910   0.1170   0.1050   0.0920   0.1240   0.0880   0.0870   0.1100 -->
+<!-- Detection Rate         0.0890   0.1110   0.0970   0.0870   0.1120   0.0810   0.0840   0.1070 -->
+<!-- Detection Prevalence   0.0940   0.1150   0.1070   0.0970   0.1160   0.0890   0.0920   0.1160 -->
+<!-- Balanced Accuracy      0.9863   0.9721   0.9563   0.9673   0.9493   0.9558   0.9784   0.9813 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.9062   0.8667 -->
+<!-- Specificity            0.9978   0.9923 -->
+<!-- Pos Pred Value         0.9775   0.9176 -->
+<!-- Neg Pred Value         0.9901   0.9869 -->
+<!-- Prevalence             0.0960   0.0900 -->
+<!-- Detection Rate         0.0870   0.0780 -->
+<!-- Detection Prevalence   0.0890   0.0850 -->
+<!-- Balanced Accuracy      0.9520   0.9295 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.142918 mins -->
+
+<!-- r4.large -->
+<!-- Confusion Matrix and Statistics -->
+
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  90   0   0   1   1   0   0   0   0   1 -->
+<!--          1   0 112   1   4   1   0   1   3   1   0 -->
+<!--          2   1   0  83   1   1   1   1   0   3   1 -->
+<!--          3   1   0   1  85   0   0   0   0   0   2 -->
+<!--          4   0   0   2   0  99   0   1   4   0   3 -->
+<!--          5   0   1   1   8   0  91   2   0   2   0 -->
+<!--          6   0   0   0   1   0   2 104   0   2   0 -->
+<!--          7   0   0   0   1   0   0   0  95   0   6 -->
+<!--          8   0   0   1   0   0   0   0   0  75   0 -->
+<!--          9   0   0   0   1   3   1   0   2   1  94 -->
+
+<!-- Overall Statistics -->
+
+<!--                Accuracy : 0.928            -->
+<!--                  95% CI : (0.9102, 0.9432) -->
+<!--     No Information Rate : 0.113            -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16        -->
+
+<!--                   Kappa : 0.9199           -->
+<!--  Mcnemar's Test P-Value : NA               -->
+
+<!-- Statistics by Class: -->
+
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9783   0.9912   0.9326   0.8333   0.9429   0.9579   0.9541   0.9135 -->
+<!-- Specificity            0.9967   0.9876   0.9901   0.9955   0.9888   0.9845   0.9944   0.9922 -->
+<!-- Pos Pred Value         0.9677   0.9106   0.9022   0.9551   0.9083   0.8667   0.9541   0.9314 -->
+<!-- Neg Pred Value         0.9978   0.9989   0.9934   0.9813   0.9933   0.9955   0.9944   0.9900 -->
+<!-- Prevalence             0.0920   0.1130   0.0890   0.1020   0.1050   0.0950   0.1090   0.1040 -->
+<!-- Detection Rate         0.0900   0.1120   0.0830   0.0850   0.0990   0.0910   0.1040   0.0950 -->
+<!-- Detection Prevalence   0.0930   0.1230   0.0920   0.0890   0.1090   0.1050   0.1090   0.1020 -->
+<!-- Balanced Accuracy      0.9875   0.9894   0.9614   0.9144   0.9658   0.9712   0.9743   0.9528 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.8929   0.8785 -->
+<!-- Specificity            0.9989   0.9910 -->
+<!-- Pos Pred Value         0.9868   0.9216 -->
+<!-- Neg Pred Value         0.9903   0.9855 -->
+<!-- Prevalence             0.0840   0.1070 -->
+<!-- Detection Rate         0.0750   0.0940 -->
+<!-- Detection Prevalence   0.0760   0.1020 -->
+<!-- Balanced Accuracy      0.9459   0.9348 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.345818 mins -->
+
+<!-- r4.xlarge -->
+<!-- Confusion Matrix and Statistics -->
+
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  93   0   0   1   0   0   0   1   0   1 -->
+<!--          1   0 106   1   1   0   0   1   2   1   0 -->
+<!--          2   0   1  89   2   0   1   0   1   2   0 -->
+<!--          3   0   0   2  84   0   2   0   0   1   3 -->
+<!--          4   0   0   0   0 102   2   2   4   0   1 -->
+<!--          5   0   1   1   2   0  96   1   0   2   0 -->
+<!--          6   1   0   1   0   0   2  88   0   4   0 -->
+<!--          7   0   0   2   1   0   0   0  98   1   5 -->
+<!--          8   0   2   6   1   0   0   0   0  75   0 -->
+<!--          9   0   0   0   2   7   1   0   3   1  89 -->
+
+<!-- Overall Statistics -->
+
+<!--                Accuracy : 0.92             -->
+<!--                  95% CI : (0.9014, 0.9361) -->
+<!--     No Information Rate : 0.11             -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16        -->
+
+<!--                   Kappa : 0.9111           -->
+<!--  Mcnemar's Test P-Value : NA               -->
+
+<!-- Statistics by Class: -->
+
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9894   0.9636   0.8725   0.8936   0.9358   0.9231   0.9565   0.8991 -->
+<!-- Specificity            0.9967   0.9933   0.9922   0.9912   0.9899   0.9922   0.9912   0.9899 -->
+<!-- Pos Pred Value         0.9687   0.9464   0.9271   0.9130   0.9189   0.9320   0.9167   0.9159 -->
+<!-- Neg Pred Value         0.9989   0.9955   0.9856   0.9890   0.9921   0.9911   0.9956   0.9877 -->
+<!-- Prevalence             0.0940   0.1100   0.1020   0.0940   0.1090   0.1040   0.0920   0.1090 -->
+<!-- Detection Rate         0.0930   0.1060   0.0890   0.0840   0.1020   0.0960   0.0880   0.0980 -->
+<!-- Detection Prevalence   0.0960   0.1120   0.0960   0.0920   0.1110   0.1030   0.0960   0.1070 -->
+<!-- Balanced Accuracy      0.9930   0.9784   0.9324   0.9424   0.9628   0.9576   0.9739   0.9445 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.8621   0.8990 -->
+<!-- Specificity            0.9901   0.9845 -->
+<!-- Pos Pred Value         0.8929   0.8641 -->
+<!-- Neg Pred Value         0.9869   0.9889 -->
+<!-- Prevalence             0.0870   0.0990 -->
+<!-- Detection Rate         0.0750   0.0890 -->
+<!-- Detection Prevalence   0.0840   0.1030 -->
+<!-- Balanced Accuracy      0.9261   0.9417 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.139538 mins -->
 
 
-code from kory becker: https://gist.github.com/primaryobjects/b0c8333834debbc15be4
+<!-- code from kory becker: https://gist.github.com/primaryobjects/b0c8333834debbc15be4 -->
 
-c4.large
-Confusion Matrix and Statistics
+<!-- c4.large -->
+<!-- Confusion Matrix and Statistics -->
 
-          Reference
-Prediction   0   1   2   3   4   5   6   7   8   9
-         0  96   0   0   0   1   0   0   3   0   1
-         1   1 102   2   1   2   0   1   1   2   0
-         2   1   0  94   1   2   2   0   2   0   0
-         3   0   0   2  85   0   2   0   0   1   0
-         4   0   0   3   0 103   3   0   2   0   5
-         5   2   1   0   5   0  83   0   0   4   3
-         6   1   0   1   1   2   2 102   0   1   0
-         7   0   0   4   1   0   0   0  94   0   1
-         8   0   0   2   0   0   0   0   0  68   1
-         9   0   0   0   4   3   2   0   1   2  88
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  96   0   0   0   1   0   0   3   0   1 -->
+<!--          1   1 102   2   1   2   0   1   1   2   0 -->
+<!--          2   1   0  94   1   2   2   0   2   0   0 -->
+<!--          3   0   0   2  85   0   2   0   0   1   0 -->
+<!--          4   0   0   3   0 103   3   0   2   0   5 -->
+<!--          5   2   1   0   5   0  83   0   0   4   3 -->
+<!--          6   1   0   1   1   2   2 102   0   1   0 -->
+<!--          7   0   0   4   1   0   0   0  94   0   1 -->
+<!--          8   0   0   2   0   0   0   0   0  68   1 -->
+<!--          9   0   0   0   4   3   2   0   1   2  88 -->
 
-Overall Statistics
-                                         
-               Accuracy : 0.915          
-                 95% CI : (0.896, 0.9315)
-    No Information Rate : 0.113          
-    P-Value [Acc > NIR] : < 2.2e-16      
-                                         
-                  Kappa : 0.9055         
- Mcnemar's Test P-Value : NA             
+<!-- Overall Statistics -->
 
-Statistics by Class:
+<!--                Accuracy : 0.915           -->
+<!--                  95% CI : (0.896, 0.9315) -->
+<!--     No Information Rate : 0.113           -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16       -->
 
-                     Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
-Sensitivity            0.9505   0.9903   0.8704   0.8673   0.9115   0.8830   0.9903   0.9126
-Specificity            0.9944   0.9889   0.9910   0.9945   0.9853   0.9834   0.9911   0.9933
-Pos Pred Value         0.9505   0.9107   0.9216   0.9444   0.8879   0.8469   0.9273   0.9400
-Neg Pred Value         0.9944   0.9989   0.9844   0.9857   0.9887   0.9878   0.9989   0.9900
-Prevalence             0.1010   0.1030   0.1080   0.0980   0.1130   0.0940   0.1030   0.1030
-Detection Rate         0.0960   0.1020   0.0940   0.0850   0.1030   0.0830   0.1020   0.0940
-Detection Prevalence   0.1010   0.1120   0.1020   0.0900   0.1160   0.0980   0.1100   0.1000
-Balanced Accuracy      0.9725   0.9896   0.9307   0.9309   0.9484   0.9332   0.9907   0.9530
-                     Class: 8 Class: 9
-Sensitivity            0.8718   0.8889
-Specificity            0.9967   0.9867
-Pos Pred Value         0.9577   0.8800
-Neg Pred Value         0.9892   0.9878
-Prevalence             0.0780   0.0990
-Detection Rate         0.0680   0.0880
-Detection Prevalence   0.0710   0.1000
-Balanced Accuracy      0.9343   0.9378
-> duration <- Sys.time() - start
-> duration
-Time difference of 2.016729 mins
+<!--                   Kappa : 0.9055          -->
+<!--  Mcnemar's Test P-Value : NA              -->
 
-c4.2xlarge
+<!-- Statistics by Class: -->
+
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9505   0.9903   0.8704   0.8673   0.9115   0.8830   0.9903   0.9126 -->
+<!-- Specificity            0.9944   0.9889   0.9910   0.9945   0.9853   0.9834   0.9911   0.9933 -->
+<!-- Pos Pred Value         0.9505   0.9107   0.9216   0.9444   0.8879   0.8469   0.9273   0.9400 -->
+<!-- Neg Pred Value         0.9944   0.9989   0.9844   0.9857   0.9887   0.9878   0.9989   0.9900 -->
+<!-- Prevalence             0.1010   0.1030   0.1080   0.0980   0.1130   0.0940   0.1030   0.1030 -->
+<!-- Detection Rate         0.0960   0.1020   0.0940   0.0850   0.1030   0.0830   0.1020   0.0940 -->
+<!-- Detection Prevalence   0.1010   0.1120   0.1020   0.0900   0.1160   0.0980   0.1100   0.1000 -->
+<!-- Balanced Accuracy      0.9725   0.9896   0.9307   0.9309   0.9484   0.9332   0.9907   0.9530 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.8718   0.8889 -->
+<!-- Specificity            0.9967   0.9867 -->
+<!-- Pos Pred Value         0.9577   0.8800 -->
+<!-- Neg Pred Value         0.9892   0.9878 -->
+<!-- Prevalence             0.0780   0.0990 -->
+<!-- Detection Rate         0.0680   0.0880 -->
+<!-- Detection Prevalence   0.0710   0.1000 -->
+<!-- Balanced Accuracy      0.9343   0.9378 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 2.016729 mins -->
+
+<!-- m4.2xlarge -->
+
+<!-- Confusion Matrix and Statistics -->
+
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0 102   0   1   0   0   0   1   0   0   2 -->
+<!--          1   0 104   5   3   1   1   2   1   3   0 -->
+<!--          2   0   0  92   6   2   1   2   2   2   0 -->
+<!--          3   0   0   0  87   0   0   0   0   1   2 -->
+<!--          4   0   0   0   0 105   1   3   2   0   3 -->
+<!--          5   2   0   1   8   0  75   1   0   1   1 -->
+<!--          6   0   0   0   1   2   1  96   0   1   0 -->
+<!--          7   0   0   0   0   1   0   0  93   0   4 -->
+<!--          8   0   0   1   2   0   0   0   0  81   0 -->
+<!--          9   0   0   0   0   5   3   0   3   3  77 -->
+
+<!-- Overall Statistics -->
+
+<!--                Accuracy : 0.912            -->
+<!--                  95% CI : (0.8927, 0.9288) -->
+<!--     No Information Rate : 0.116            -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16        -->
+
+<!--                   Kappa : 0.9021           -->
+<!--  Mcnemar's Test P-Value : NA               -->
+
+<!-- Statistics by Class: -->
+
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9808   1.0000   0.9200   0.8131   0.9052   0.9146   0.9143   0.9208 -->
+<!-- Specificity            0.9955   0.9821   0.9833   0.9966   0.9898   0.9847   0.9944   0.9944 -->
+<!-- Pos Pred Value         0.9623   0.8667   0.8598   0.9667   0.9211   0.8427   0.9505   0.9490 -->
+<!-- Neg Pred Value         0.9978   1.0000   0.9910   0.9780   0.9876   0.9923   0.9900   0.9911 -->
+<!-- Prevalence             0.1040   0.1040   0.1000   0.1070   0.1160   0.0820   0.1050   0.1010 -->
+<!-- Detection Rate         0.1020   0.1040   0.0920   0.0870   0.1050   0.0750   0.0960   0.0930 -->
+<!-- Detection Prevalence   0.1060   0.1200   0.1070   0.0900   0.1140   0.0890   0.1010   0.0980 -->
+<!-- Balanced Accuracy      0.9882   0.9911   0.9517   0.9049   0.9475   0.9497   0.9543   0.9576 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.8804   0.8652 -->
+<!-- Specificity            0.9967   0.9846 -->
+<!-- Pos Pred Value         0.9643   0.8462 -->
+<!-- Neg Pred Value         0.9880   0.9868 -->
+<!-- Prevalence             0.0920   0.0890 -->
+<!-- Detection Rate         0.0810   0.0770 -->
+<!-- Detection Prevalence   0.0840   0.0910 -->
+<!-- Balanced Accuracy      0.9386   0.9249 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.095459 mins -->
+
+<!-- m4.4xlarge -->
+<!-- Confusion Matrix and Statistics -->
+
+<!--           Reference -->
+<!-- Prediction   0   1   2   3   4   5   6   7   8   9 -->
+<!--          0  87   0   0   0   0   0   1   0   0   1 -->
+<!--          1   0 106   3   0   1   0   2   1   1   0 -->
+<!--          2   2   0  92   4   1   0   1   1   1   0 -->
+<!--          3   1   0   0  93   0   2   0   0   0   0 -->
+<!--          4   0   0   0   0 104   1   0   4   0   3 -->
+<!--          5   0   1   1   6   0  97   1   0   3   1 -->
+<!--          6   0   0   0   0   3   4  94   0   2   0 -->
+<!--          7   0   1   1   0   0   0   0  99   0   3 -->
+<!--          8   1   0   1   2   0   0   0   0  73   0 -->
+<!--          9   0   0   0   2   2   1   0   2   4  82 -->
+
+<!-- Overall Statistics -->
+
+<!--                Accuracy : 0.927            -->
+<!--                  95% CI : (0.9091, 0.9423) -->
+<!--     No Information Rate : 0.111            -->
+<!--     P-Value [Acc > NIR] : < 2.2e-16        -->
+
+<!--                   Kappa : 0.9188           -->
+<!--  Mcnemar's Test P-Value : NA               -->
+
+<!-- Statistics by Class: -->
+
+<!--                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7 -->
+<!-- Sensitivity            0.9560   0.9815   0.9388   0.8692   0.9369   0.9238   0.9495   0.9252 -->
+<!-- Specificity            0.9978   0.9910   0.9889   0.9966   0.9910   0.9855   0.9900   0.9944 -->
+<!-- Pos Pred Value         0.9775   0.9298   0.9020   0.9687   0.9286   0.8818   0.9126   0.9519 -->
+<!-- Neg Pred Value         0.9956   0.9977   0.9933   0.9845   0.9921   0.9910   0.9944   0.9911 -->
+<!-- Prevalence             0.0910   0.1080   0.0980   0.1070   0.1110   0.1050   0.0990   0.1070 -->
+<!-- Detection Rate         0.0870   0.1060   0.0920   0.0930   0.1040   0.0970   0.0940   0.0990 -->
+<!-- Detection Prevalence   0.0890   0.1140   0.1020   0.0960   0.1120   0.1100   0.1030   0.1040 -->
+<!-- Balanced Accuracy      0.9769   0.9863   0.9638   0.9329   0.9640   0.9546   0.9698   0.9598 -->
+<!--                      Class: 8 Class: 9 -->
+<!-- Sensitivity            0.8690   0.9111 -->
+<!-- Specificity            0.9956   0.9879 -->
+<!-- Pos Pred Value         0.9481   0.8817 -->
+<!-- Neg Pred Value         0.9881   0.9912 -->
+<!-- Prevalence             0.0840   0.0900 -->
+<!-- Detection Rate         0.0730   0.0820 -->
+<!-- Detection Prevalence   0.0770   0.0930 -->
+<!-- Balanced Accuracy      0.9323   0.9495 -->
+<!-- > duration <- Sys.time() - start -->
+<!-- > duration -->
+<!-- Time difference of 1.076214 mins -->
+
+<!-- m4.16xlarge -->
