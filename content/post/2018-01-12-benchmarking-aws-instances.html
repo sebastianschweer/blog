@@ -15,7 +15,7 @@ tags:
 
 
 
-<p>In <a href="/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/">a previous post</a>I have shown you how to setup an AWS instance running the newest RStudio, R, Python, Julia and so forth, where the configuration of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there: There are different instance classes (General Purpose, Compute Optimized, RAM Optimized, … ) and different instance sizes within these classes. For General Purpose, or t2, there are, e.g. t2.nano, t2.micro, t2.small, t2.medium, t2.large, t2.xlarge and t2.2xlarge<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
+<p>In <a href="/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/">a previous post</a> I have shown you how to setup an AWS instance running the newest RStudio, R, Python, Julia and so forth, where the configuration of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there: There are different instance classes (General Purpose, Compute Optimized, RAM Optimized, … ) and different instance sizes within these classes. For General Purpose, or t2, there are, e.g. t2.nano, t2.micro, t2.small, t2.medium, t2.large, t2.xlarge and t2.2xlarge<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
 <p>These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!</p>
 <div id="the-test" class="section level1">
 <h1>The Test</h1>
@@ -40,23 +40,163 @@ tags:
 <h2>The Results</h2>
 <p>I started with the candidate <code>t2.micro</code>, which is free of charge. Unfortunately, the script never succesfully ran the training of the model, presumably because the dimension of merely 1 GB of RAM is not sufficient. Still, a “not possible” result is still a useful result for choosing the right infrastructure.</p>
 <p>Let’s have a first look at the results, first in plain numbers:</p>
-<pre><code>## # A tibble: 14 x 8
-##    instance_class instance_size    ram vcpus    ecu price_p… elaps… accur…
-##    &lt;chr&gt;          &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-##  1 t2             micro           1.00  1.00  NA      0.0134   NA   NA    
-##  2 t2             small           2.00  1.00  NA      0.0268   68.6  0.917
-##  3 t2             large           8.00  2.00  NA      0.107    65.3  0.918
-##  4 t2             xlarge         16.0   4.00  NA      0.214    55.6  0.918
-##  5 t2             2xlarge        32.0   8.00  NA      0.429    56.3  0.919
-##  6 t2             medium          4.00  2.00  NA      0.0536   64.0  0.919
-##  7 m4             large           8.00  2.00   6.50   0.120    82.8  0.933
-##  8 m4             xlarge         15.0   4.00  13.0    0.240    80.7  0.928
-##  9 m4             2xlarge        32.0   8.00  26.0    0.480    65.7  0.912
-## 10 m4             4xlarge        64.0  16.0   53.5    0.960    64.6  0.927
-## 11 m4             16xlarge      256    64.0  188      3.84     93.3  0.915
-## 12 r4             large          15.2   2.00   7.00   0.160    80.7  0.928
-## 13 r4             xlarge         30.5  13.5    4.00   0.320    68.4  0.920
-## 14 c4             large           3.75  2.00   8.00   0.114   121    0.915</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-2">Table 1: </span>AWS MNIST Benchmark Results</caption>
+<thead>
+<tr class="header">
+<th align="left">instance_class</th>
+<th align="left">instance_size</th>
+<th align="right">ram</th>
+<th align="right">vcpus</th>
+<th align="right">ecu</th>
+<th align="right">price_per_hour</th>
+<th align="right">elapsed_time</th>
+<th align="right">accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">t2</td>
+<td align="left">micro</td>
+<td align="right">1.00</td>
+<td align="right">1.0</td>
+<td align="right">NA</td>
+<td align="right">0.0134</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">t2</td>
+<td align="left">small</td>
+<td align="right">2.00</td>
+<td align="right">1.0</td>
+<td align="right">NA</td>
+<td align="right">0.0268</td>
+<td align="right">68.624</td>
+<td align="right">0.917</td>
+</tr>
+<tr class="odd">
+<td align="left">t2</td>
+<td align="left">large</td>
+<td align="right">8.00</td>
+<td align="right">2.0</td>
+<td align="right">NA</td>
+<td align="right">0.1072</td>
+<td align="right">65.335</td>
+<td align="right">0.918</td>
+</tr>
+<tr class="even">
+<td align="left">t2</td>
+<td align="left">xlarge</td>
+<td align="right">16.00</td>
+<td align="right">4.0</td>
+<td align="right">NA</td>
+<td align="right">0.2144</td>
+<td align="right">55.611</td>
+<td align="right">0.918</td>
+</tr>
+<tr class="odd">
+<td align="left">t2</td>
+<td align="left">2xlarge</td>
+<td align="right">32.00</td>
+<td align="right">8.0</td>
+<td align="right">NA</td>
+<td align="right">0.4288</td>
+<td align="right">56.284</td>
+<td align="right">0.919</td>
+</tr>
+<tr class="even">
+<td align="left">t2</td>
+<td align="left">medium</td>
+<td align="right">4.00</td>
+<td align="right">2.0</td>
+<td align="right">NA</td>
+<td align="right">0.0536</td>
+<td align="right">63.961</td>
+<td align="right">0.919</td>
+</tr>
+<tr class="odd">
+<td align="left">m4</td>
+<td align="left">large</td>
+<td align="right">8.00</td>
+<td align="right">2.0</td>
+<td align="right">6.5</td>
+<td align="right">0.1200</td>
+<td align="right">82.823</td>
+<td align="right">0.933</td>
+</tr>
+<tr class="even">
+<td align="left">m4</td>
+<td align="left">xlarge</td>
+<td align="right">15.00</td>
+<td align="right">4.0</td>
+<td align="right">13.0</td>
+<td align="right">0.2400</td>
+<td align="right">80.749</td>
+<td align="right">0.928</td>
+</tr>
+<tr class="odd">
+<td align="left">m4</td>
+<td align="left">2xlarge</td>
+<td align="right">32.00</td>
+<td align="right">8.0</td>
+<td align="right">26.0</td>
+<td align="right">0.4800</td>
+<td align="right">65.728</td>
+<td align="right">0.912</td>
+</tr>
+<tr class="even">
+<td align="left">m4</td>
+<td align="left">4xlarge</td>
+<td align="right">64.00</td>
+<td align="right">16.0</td>
+<td align="right">53.5</td>
+<td align="right">0.9600</td>
+<td align="right">64.573</td>
+<td align="right">0.927</td>
+</tr>
+<tr class="odd">
+<td align="left">m4</td>
+<td align="left">16xlarge</td>
+<td align="right">256.00</td>
+<td align="right">64.0</td>
+<td align="right">188.0</td>
+<td align="right">3.8400</td>
+<td align="right">93.310</td>
+<td align="right">0.915</td>
+</tr>
+<tr class="even">
+<td align="left">r4</td>
+<td align="left">large</td>
+<td align="right">15.25</td>
+<td align="right">2.0</td>
+<td align="right">7.0</td>
+<td align="right">0.1600</td>
+<td align="right">80.749</td>
+<td align="right">0.928</td>
+</tr>
+<tr class="odd">
+<td align="left">r4</td>
+<td align="left">xlarge</td>
+<td align="right">30.50</td>
+<td align="right">13.5</td>
+<td align="right">4.0</td>
+<td align="right">0.3200</td>
+<td align="right">68.372</td>
+<td align="right">0.920</td>
+</tr>
+<tr class="even">
+<td align="left">c4</td>
+<td align="left">large</td>
+<td align="right">3.75</td>
+<td align="right">2.0</td>
+<td align="right">8.0</td>
+<td align="right">0.1140</td>
+<td align="right">121.004</td>
+<td align="right">0.915</td>
+</tr>
+</tbody>
+</table>
 <p>A core assumption is that “more computing power yields faster results”. A second core assumption is that “the higher the computing power, the higher the cost”. Combining these assumptions leads us to assume that “higher cost leads to a lower time elapsed”. A quick visualization of the data demonstrates that the results support this notion: <img src="/post/2018-01-12-benchmarking-aws-instances_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>The measurement of the instance “m4.16xlarge” doesn’t quite fit into the pattern, and I am frankly unsure of the reasons. The measurement was taken twice, so that circumstantial errors leading to this measurement can be rejected.</p>
 <p>Let us look a little more precisely at the data, in order to establish the most influential factors determining the speed of the analysis. We use the wonderful “ggpairs” visualization of the <code>GGally</code> package and omit the observation of the instance “m4.16xlarge” in the analysis:</p>
@@ -64,10 +204,32 @@ tags:
 <p>This plot contains a number of results at once. First off, and unsurprisingly, the price per hour correlates vey strongly with the number of virtual CPUs and the size of the RAM, indicating that “the higher the computing power, the higher the cost” was a correct core assumption.</p>
 <p>Second, the correlation between “elapsed_time” and the numeric indicators of performance “RAM”, “vCPUs” and “Price per Hour” is clearly negative across the board, but the highest correlation is clearly attained by the dimension RAM. This provides yet another indication that the notion “Performance of R hinges on RAM” is true.</p>
 <p>One last question to consider: which instance type is optimal for “R” purposes? Optimality will be defined by “provide the quickest results for the least money”. Compare the fits of a standard linear model:</p>
-<pre><code>##   instance_class (Intercept) price_per_hour
-## 1             m4    83.66913      -22.66862
-## 2             r4    93.12600      -77.35625
-## 3             t2    66.86029      -29.47335</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">instance_class</th>
+<th align="right">(Intercept)</th>
+<th align="right">price_per_hour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">m4</td>
+<td align="right">83.66913</td>
+<td align="right">-22.66862</td>
+</tr>
+<tr class="even">
+<td align="left">r4</td>
+<td align="right">93.12600</td>
+<td align="right">-77.35625</td>
+</tr>
+<tr class="odd">
+<td align="left">t2</td>
+<td align="right">66.86029</td>
+<td align="right">-29.47335</td>
+</tr>
+</tbody>
+</table>
 <p>This shows that the entry price is cheapest for instances of the class “t2”, as the y-intercept is the lowest in this case. However, in cases of higher Price per Hour, i.e. higher necessary computing power, “r4” is the better choice: The time decreases quickest with the increase in power. Both lines meet at a price per hour of roughly 55 Cents per hour, corresponding to an instance r4.2xlarge with 61 GB RAM.</p>
 </div>
 </div>

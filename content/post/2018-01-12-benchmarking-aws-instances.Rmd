@@ -14,7 +14,7 @@ tags:
 ---
 
 
-In [a previous post](/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/)I have shown you how to setup an AWS instance running the newest RStudio, R, Python, Julia and so forth, where the configuration of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there: There are different instance classes (General Purpose, Compute Optimized, RAM Optimized, ... )
+In [a previous post](/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/) I have shown you how to setup an AWS instance running the newest RStudio, R, Python, Julia and so forth, where the configuration of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there: There are different instance classes (General Purpose, Compute Optimized, RAM Optimized, ... )
 and different instance sizes within these classes. For General Purpose, or t2, there are, e.g. t2.nano,
 t2.micro, t2.small, t2.medium, t2.large, t2.xlarge and t2.2xlarge[^1].
 
@@ -52,6 +52,8 @@ Let's have a first look at the results, first in plain numbers:
 suppressWarnings(library(plyr))
 suppressMessages(library(dplyr))
 suppressMessages(library(tibble))
+suppressMessages(library(knitr))
+
 
 t2_micro <- 
   c(instance_class = "t2",
@@ -214,9 +216,11 @@ benchmark_df <-
             funs(as.numeric))
 ```
 
-```{r, echo = FALSE, include=TRUE}
-benchmark_df
+```{r echo = FALSE, results = "asis"}
+kable(benchmark_df, caption = "AWS MNIST Benchmark Results")
 ```
+
+
 A core assumption is that "more computing power yields faster results". A second core assumption is that "the higher the computing power, the higher the cost". Combining these assumptions leads us to assume that "higher cost leads to a lower time elapsed". A quick visualization of the data demonstrates that the results support this notion:
 ```{r, echo = FALSE, include=TRUE, warning=FALSE}
 suppressMessages(library(ggplot2))
@@ -249,14 +253,15 @@ Second, the correlation between "elapsed_time" and the numeric indicators of per
 
 One last question to consider: which instance type is optimal for "R" purposes? Optimality will be defined by "provide the quickest results for the least money". Compare the fits of a standard linear model:
 
-```{r, echo = FALSE, include=TRUE, warning=FALSE}
+```{r, echo = FALSE, include=TRUE, warning=FALSE, results = 'asis'}
 # Kind regards to Hadley: https://stackoverflow.com/questions/1169539/linear-regression-and-group-by-in-r
 models <- dlply(benchmark_df  %>% filter(instance_size != "16xlarge", instance_class != "c4"), "instance_class", function(df) 
   lm(elapsed_time ~ price_per_hour, data = df))
 
 # Apply coef to each model and return a data frame
-ldply(models, coef)
+kable(ldply(models, coef))
 ```
+
 This shows that the entry price is cheapest for instances of the class "t2", as the y-intercept is the lowest in this case. However, in cases of higher Price per Hour, i.e. higher necessary computing power, "r4" is the better choice: The time decreases quickest with the increase in power. Both lines meet at a price per hour of roughly 55 Cents per hour, corresponding to an instance r4.2xlarge with 61 GB RAM. 
 
 # Takeaway Messages
