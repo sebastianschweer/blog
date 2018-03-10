@@ -1,7 +1,7 @@
 ---
 title: Benchmarking AWS Instances with MNIST classification in R
 author: Sebastian Schweer
-date: '2018-01-12'
+date: '2018-03-10'
 slug: benchmarking-aws-instances
 categories:
   - AWS
@@ -14,13 +14,13 @@ tags:
 ---
 
 
-In [a previous post](/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/)I have shown you how to setup an AWS instance running the newest RStudio, R, Python, Julia and so forth, where the configuration of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there, just check out the drop-down menu on the page itself:
-
-[...why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!]()
+In [a previous post](/2018/01/setting-up-a-scalable-rstudio-instance-in-aws/)I have shown you how to setup an AWS instance running the newest RStudio, R, Python, Julia and so forth, where the configuration of the instance can be freely chosen. However, there is quite a lot of possibilities of instance configurations out there: There are different instance classes (General Purpose, Compute Optimized, RAM Optimized, ... )
+and different instance sizes within these classes. For General Purpose, or t2, there are, e.g. t2.nano,
+t2.micro, t2.small, t2.medium, t2.large, t2.xlarge and t2.2xlarge[^1].
 
 These instances differ in two dimensions: price and performance. Obviously, these dimensions are highly correlated, since higher price means (or should mean, at least) higher performance. Now, price is easily measured, yet performance is a bit trickier: For example, it is not entirely straightforward to assess the impact of higher RAM, CPU or even GPU directly across many different configurations. But we’re doing data science, right? So why not create a programmatic test in order to gauge the performance empirically? Well, let‘s do it!
 
-## The Test
+# The Test
 For this benchmark test I chose a classical machine learning task: the classification of the [MNIST](LINK) dataset of handwritten digits, to be categorized as 0-9. This data set has been used to gauge the accuracy of machine learning algorithms since 
 
 For this benchmark test, I borrowed a nice skript by Kory Becker written [here](https://gist.github.com/primaryobjects/b0c8333834debbc15be4), which trains a Support Vector Machine (SVM) on the problem, using only the first 1000 observations of the dataset, each with 768 attributes. I altered the code ever so slightly to that each run of the script returns the following measurements:
@@ -37,8 +37,9 @@ Additionally, I included the following information:
 ## The Candidates
 
 AWS provides a large number of different configurations, and I will not discuss all of these in this post. Rather, let me focus on four different specifications of computing resource demands and chose a distinctive representative:
-- General: t2
-- Something: m2
+- General Purpose: t2, m4
+- Compute Optimized: c4
+- Memory Optimized: r4
 
 For each of these classes, I had planned to test the sizes small, medium, large, xlarge and 2xlarge. The sizes micro, small and medium are actually only available for t2 (oh, no!), so that I ended up only testing 14 configurations. 
 
@@ -48,6 +49,7 @@ I started with the candidate `t2.micro`, which is free of charge. Unfortunately,
 
 Let's have a first look at the results, first in plain numbers:
 ```{r echo=FALSE}
+suppressWarnings(library(plyr))
 suppressMessages(library(dplyr))
 suppressMessages(library(tibble))
 
@@ -215,13 +217,22 @@ benchmark_df <-
 ```{r, echo = FALSE, include=TRUE}
 benchmark_df
 ```
+A core assumption is that "more computing power yields faster results". A second core assumption is that "the higher the computing power, the higher the cost". Combining these assumptions leads us to assume that "higher cost leads to a lower time elapsed". A quick visualization of the data demonstrates that the results support this notion:
+```{r, echo = FALSE, include=TRUE, warning=FALSE}
+suppressMessages(library(ggplot2))
+suppressMessages(library(ggrepel))
+ggplot(benchmark_df) +
+  geom_point(aes(price_per_hour, elapsed_time, color = instance_class)) +
+  geom_text_repel(aes(price_per_hour, elapsed_time, label = instance_size)) +
+  theme_bw(base_size = 12)
+```
 
-## Which factors influence performance?
+The measurement of the instance "m4.16xlarge" doesn't quite fit into the pattern, and I am frankly unsure of the reasons. The measurement was taken twice, so that circumstantial errors leading to this measurement can be rejected. 
 
-In order to establish the most influential factors, we use the wonderful "ggpairs" visualization of the `GGally` package.
+Let us look a little more precisely at the data, in order to establish the most influential factors determining the speed of the analysis. We use the wonderful "ggpairs" visualization of the `GGally` package and omit the observation of the instance "m4.16xlarge" in the analysis:
 
 ```{r, echo = FALSE}
-suppressMessages(library(ggplot2))
+
 suppressMessages(library(GGally))
 plot_pairs <- ggpairs(benchmark_df %>% filter(instance_size != "16xlarge"), 
                       mapping = aes(color = instance_class), 
@@ -229,9 +240,35 @@ plot_pairs <- ggpairs(benchmark_df %>% filter(instance_size != "16xlarge"),
 ```
 
 ```{r, echo = FALSE, include=TRUE, warning=FALSE}
-suppressWarnings(plot_pairs)
+suppressWarnings(plot_pairs + theme_bw(base_size = 12))
 ```
 
+This plot contains a number of results at once. First off, and unsurprisingly, the price per hour correlates vey strongly with the number of virtual CPUs and the size of the RAM, indicating that "the higher the computing power, the higher the cost" was a correct core assumption. 
+
+Second, the correlation between "elapsed_time" and the numeric indicators of performance "RAM", "vCPUs" and "Price per Hour" is clearly negative across the board, but the highest correlation is clearly attained by the dimension RAM. This provides yet another indication that the notion "Performance of R hinges on RAM" is true. 
+
+One last question to consider: which instance type is optimal for "R" purposes? Optimality will be defined by "provide the quickest results for the least money". Compare the fits of a standard linear model:
+
+```{r, echo = FALSE, include=TRUE, warning=FALSE}
+# Kind regards to Hadley: https://stackoverflow.com/questions/1169539/linear-regression-and-group-by-in-r
+models <- dlply(benchmark_df  %>% filter(instance_size != "16xlarge", instance_class != "c4"), "instance_class", function(df) 
+  lm(elapsed_time ~ price_per_hour, data = df))
+
+# Apply coef to each model and return a data frame
+ldply(models, coef)
+```
+This shows that the entry price is cheapest for instances of the class "t2", as the y-intercept is the lowest in this case. However, in cases of higher Price per Hour, i.e. higher necessary computing power, "r4" is the better choice: The time decreases quickest with the increase in power. Both lines meet at a price per hour of roughly 55 Cents per hour, corresponding to an instance r4.2xlarge with 61 GB RAM. 
+
+# Takeaway Messages
+
+To conclude this article, let me summarize the key findings:
+
+ - The most important hardware feature for the increasing computing speed of "R" analysis is RAM
+ - For analysis with a small to medium scope of performance (RAM less than 60 GB), the instance class "t2" is the best choice in AWS.
+ - For larger scale projects, the instance class "r4", optimzed for RAM usage, is the optimal choice.
+ 
+
+ 
 
 <!-- t2.medium: -->
 <!-- Confusion Matrix and Statistics -->
@@ -890,3 +927,5 @@ suppressWarnings(plot_pairs)
 <!-- Time difference of 1.076214 mins -->
 
 <!-- m4.16xlarge -->
+
+[^1]: ...why is it ‚nano‘, ‚micro‘ but then ‚large‘ ‚extra large‘? Be consistent, dangit!
