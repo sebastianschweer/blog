@@ -1,0 +1,46 @@
+---
+title: Don't Worry, Google Only Checks Your Location Every 10 Minutes... 
+#subtitle: Visualizing Google Takeout Data
+author: "Sebastian Schweer"
+date: '2018-04-15'
+slug: visualizing_google_takeout
+tags: Visualization
+categories:
+- Google
+- R
+---
+
+I have a personal Google account, complete with E-Mail, Gdrive and everything else. I first opened it up as a sort of spam email for all kinds of logins, but started to use more and more due to its convenience. I was always slightly worried about the magnitude of data collected by Google on me, yet I never found a way to pinpoint exactly the extent of my slight worrying.
+
+Recently, I discovered [Google Takeout](https://en.wikipedia.org/wiki/Google_Takeout). Everybody with a Google Account can simply click [here](https://takeout.google.com/settings/takeout), follow the instructions and Google Takeout will send all the data it (supposedly) has in a nice little zip folder. Within this zip-folder is a file called "locationhistory.json", with entries such as this:
+
+```{r, eval = FALSE}
+{
+    "timestampMs" : "1523378268382",
+    "latitudeE7" : 494290669,
+    "longitudeE7" : 86872541,
+    "accuracy" : 34
+}
+```
+Each of these entries encodes a location measurement taken by Google, with GPS coordinates (latitude/longitude) and a timestamp, which can be converted to a "normal date" e.g. [here](https://currentmillis.com/).
+
+The "location history" file is rather large and unwieldy (about 18 MB in my case). There is a very simple and free tool that [visualizes your location history data in an interactive heatmap](https://locationhistoryvisualizer.com/heatmap/). That is the tool I used to create the intro picture to this entry. The heatmap allows you to gauge the precision, with which Google matches your movements. For instance, my skiing trip in March last year to [Serfaus-Fiss-Ladis](https://www.serfaus-fiss-ladis.at/de) shows up like this:
+
+![But I was never in "Gasthaus zum weißen Lamm", I know that for a fact!](http://res.cloudinary.com/dlprdrxib/image/upload/v1523785896/google_heatmap_fiss_hcnim9.png)
+
+There are some mistakes in this map, i.e., places that I have surely never visited. However, the detail is quite astonishing, leading me to the next question: How often does Google measure and store my location data? My "locationhistory.json" contains 59293 observation over the course of 465 days, so that, on average, there are more than 5 measurements *per hour*. 
+
+I decided to look a little closer at the distributions of the timestamps, using some wonderful ggplot magic (the R code can be found [here]()):
+
+![The dashed line indicates the aveerage over all weekdays](http://res.cloudinary.com/dlprdrxib/image/upload/v1523785917/Hourly_overview_google_location_data_th9l6z.png)
+
+The plot highlights several information:
+
+- Between noon and 8 pm, Google takes on average more than one location measurement every 10 minutes
+- In the nighttime, the average number of measurements is only once every 20 minutes
+- Monday and Tuesday mornings are closely watched with many measurements, especially Tuesday mornings
+- Afternoons and evenings are always of interest, but especially on Fridday and Saturday.
+
+The fact that Monday and Tuesday morning are such exceptions could be explained by my specific calendar in 2017: I worked as a consultant and usually left home on Tuesday morning to travel troughout Germany. I am not entirely sure why this should lead to more measurements, as this activity was rarely accompanied by Google services (I travel by Deutsche Bahn). However, my travel time back home, usually alte Thursday evening, can also be seen quite nicely in the plot. 
+
+In total, I am a bit shocked by the sheer magnitude of measurements Google has on me, even (and especially) at times at which I am positively certain that I have never used Google Location Services, i.e. 4 am. I am glad that services like Google Maps exist and that they are so extremely convenient, but the drawback should also be made abundantly clear to anyone who uses these services: many machine-readable aspects of your life are known to a for-profit company.
